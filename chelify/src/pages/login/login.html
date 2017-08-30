@@ -1,18 +1,41 @@
-<ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>Home</ion-title>
-  </ion-navbar>
-</ion-header>
-
 <ion-content padding>
-  <h3>Chelify</h3>
+    <img src="assets/logo.png" class="logo" />
+    <ion-input type="email" placeholder="Correo electrónico"></ion-input>
+    <ion-input type="password" placeholder="Contraseña"></ion-input>
+    <button class="login" ion-button color="light" (click)="example();">Iniciar sesión</button>
+    <button class="login" ion-button color="light">Nueva cuenta</button>
+    <button class="forgot" ion-button clear>Olvidé mi contraseña</button>
 
-  <p>
-    Wey
-  </p>
-
-  <button ion-button secondary menuToggle>Toggle Menu</button>
 </ion-content>
+
+<style>
+    ion-content
+    {
+        background: -webkit-linear-gradient(bottom, #9415C9 , #24E189);
+        background: -o-linear-gradient(bottom, #9415C9 , #24E189);
+        background: -moz-linear-gradient(bottom, #9415C9 , #24E189);
+        background: linear-gradient(to bottom, #9415C9 , #24E189);
+        text-align: center;
+    }
+    .logo
+    {
+        max-width: 50%;
+        margin-top: 150px;
+    }
+    ion-input
+    {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #009688;
+        color: white;
+    }
+    button.login
+    {
+        margin-top: 20px;
+        color: #9415C9;
+    }
+    button.forgot
+    {
+        color: lightgray;
+    }
+</style>
