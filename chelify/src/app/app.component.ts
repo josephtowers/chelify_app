@@ -8,6 +8,8 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
 import { LoginPage } from '../pages/login/login';
+import { WelcomePage } from '../pages/welcome/welcome';
+import { RegisterPage } from '../pages/register/register';
 
 @Component({
   templateUrl: 'app.html'
@@ -26,7 +28,8 @@ export class MyApp {
     this.pages = [
       { title: 'Home', component: HomePage },
       { title: 'List', component: ListPage },
-      { title: 'Login', component: LoginPage }
+      { title: 'Login', component: LoginPage },
+      { title: 'Welcome', component: WelcomePage }
     ];
 
   }
