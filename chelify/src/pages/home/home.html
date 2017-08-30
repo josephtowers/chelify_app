@@ -1,18 +1,87 @@
 <ion-header>
-  <ion-navbar>
+  <ion-navbar #f53d3d>
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-title>Inicio</ion-title>
   </ion-navbar>
 </ion-header>
+<ion-content style="background-color:#F3F3F3">
+ <ion-card hidden>
+  <ion-card-header>
+    Alertas
+  </ion-card-header>
+  <ion-card-content>
+    <ion-item>
+<!--    <ion-avatar item-start>-->
+     <ion-icon name="card" item-start></ion-icon>
+<!--    </ion-avatar>-->
+    <h2>Tarjeta de crédito VISA 2609</h2>
+    <p>La fecha límite de pago es mañana</p>
+  </ion-item>
+      <button ion-button clear right>Ver todas</button>
+  </ion-card-content>
+</ion-card>
 
-<ion-content padding>
-  <h3>Chelify</h3>
-
-  <p>
-    Wey
-  </p>
-
-  <button ion-button secondary menuToggle>Toggle Menu</button>
+    <div class="main-div">
+        <img src="assets/nopictureset.jpg" class="image" />
+        <p style="font-size:20px">John Doe</p>
+        <ion-item>
+    <ion-avatar item-start class="avatar-score">
+        <div class="score">98</div>     
+    </ion-avatar>
+    <h2>Tu puntuación Chelify es 98</h2>
+    <p>Mira el reporte aquí</p>
+  </ion-item>
+         <div class="overview">
+             <p>Resumen del mes de agosto</p>
+        <canvas #doughnutCanvas></canvas>
+        </div>
+     
+    </div>
+    <ion-fab right bottom>
+    <button ion-fab><ion-icon name="add"></ion-icon></button>
+    <ion-fab-list side="top">
+      <button ion-fab><ion-icon name="logo-facebook"></ion-icon></button>
+      <button ion-fab><ion-icon name="logo-twitter"></ion-icon></button>
+      <button ion-fab><ion-icon name="logo-vimeo"></ion-icon></button>
+      <button ion-fab><ion-icon name="logo-googleplus"></ion-icon></button>
+    </ion-fab-list>
+  </ion-fab>
 </ion-content>
+
+<style>
+.main-div
+    {
+        width:100%;
+        height: 100%;
+        background-color: white;
+        padding: 20px;
+        text-align: center;
+        margin-top: 100px;
+    }
+    .image
+    {
+        border-radius: 100%;
+        border: 5px solid #9415C9;
+        width: 141px;
+        height: 141px;
+        margin: 0 auto;
+        margin-top: -90px;
+        
+    }
+    .avatar-score
+    {
+        border: 4px solid #19C274;
+        border-radius: 100%;
+        text-align:center;
+        color: #19C274;
+        min-height: 50px;
+        min-width: 50px;
+        line-height: 40px;
+    }
+.overview
+    {
+        padding: 0 30px;
+    }
+</style>
