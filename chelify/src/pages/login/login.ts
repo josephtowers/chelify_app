@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, ModalController } from 'ionic-angular';
 import { HomePage } from '../../pages/home/home';
+import { RegisterPage } from '../../pages/register/register';
 import { AndroidFingerprintAuth } from '@ionic-native/android-fingerprint-auth';
 import { AndroidPermissions } from '@ionic-native/android-permissions';
 
@@ -10,8 +11,12 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
   templateUrl: 'login.html'
 })
 export class LoginPage {
- constructor(public navCtrl: NavController, public androidFingerprintAuth: AndroidFingerprintAuth, private androidPermissions: AndroidPermissions) {
+ constructor(public navCtrl: NavController, public androidFingerprintAuth: AndroidFingerprintAuth, private androidPermissions: AndroidPermissions, public modalCtrl: ModalController) {
     
+  }
+  presentModal() {
+    
+ this.navCtrl.push(RegisterPage);
   }
 example(){
  this.navCtrl.setRoot(HomePage);
