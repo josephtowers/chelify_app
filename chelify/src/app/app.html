@@ -1,8 +1,8 @@
 <ion-menu [content]="content">
   <ion-header>
     <ion-toolbar style="text-align:center">
-<!--      <ion-title>Chelify</ion-title>-->
-        <img src="assets/logo.png" class="logo" style="height:40px" />
+      <ion-title>Chelify</ion-title>
+<!--        <img src="assets/logo.png" class="logo" style="height:40px" />-->
     </ion-toolbar>
   </ion-header>
 
@@ -18,3 +18,10 @@
 
 <!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
 <ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>
+<style>
+    ion-menu
+    {
+        
+        font-family: Circular !important;
+    }
+</style>
