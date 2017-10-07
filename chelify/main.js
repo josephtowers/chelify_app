@@ -59,7 +59,13 @@ class Swipe extends React.Component {
                     resizeMode='contain'
                     source={require('./assets/img/welcome/screen1.png')}
                 />
-                    <Text style={styles.text}>Página 1</Text>
+                    <Text style={styles.centralizedTitle}>¡Te damos la{"\n"}bienvenida a Chelify!</Text>
+                    <Text style={styles.centralizedParagraph}>
+                        En breve, comenzarás a administrar
+                        tus finanzas personales de forma
+                        rápida, segura y dinámica. Primero,
+                        vamos a configurar tu entorno.
+                    </Text>
                 </View>
                 <View style={styles.slide}>
                 <Image
@@ -67,7 +73,14 @@ class Swipe extends React.Component {
                 resizeMode='contain'
                 source={require('./assets/img/welcome/screen2.png')}
             />
-                    <Text style={styles.text}>Página 2</Text>
+                    <Text style={styles.centralizedTitle}>Agrega una cuenta{"\n"}o tarjeta</Text>
+                    <Text style={styles.centralizedParagraph}>
+                        Puedes agregar todas las cuentas
+                        y tarjetas que tengas para que
+                        registres las transacciones que se
+                        generen a través de cada una. El
+                        efectivo siempre es una opción.
+                    </Text>
                 </View>
                 <View style={styles.slide}>
                 <Image
@@ -448,6 +461,19 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 'bold',
         marginTop: 20 
+    },
+    centralizedTitle: {
+        color: '#000',
+        fontSize: 30,
+        fontWeight: 'bold',
+        marginTop: 20,
+        textAlign: 'center'
+    },
+    centralizedParagraph: {
+        color: '#95989A',
+        fontSize: 20,
+        textAlign: 'center',
+        padding: 12,
     }
 });
 
