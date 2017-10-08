@@ -68,19 +68,24 @@ class Swipe extends React.Component {
                     </Text>
                 </View>
                 <View style={styles.slide}>
-                <Image
-                style={{ width: 200, height: 100 }}
-                resizeMode='contain'
-                source={require('./assets/img/welcome/screen2.png')}
-            />
-                    <Text style={styles.centralizedTitle}>Agrega una cuenta{"\n"}o tarjeta</Text>
-                    <Text style={styles.centralizedParagraph}>
-                        Puedes agregar todas las cuentas
-                        y tarjetas que tengas para que
-                        registres las transacciones que se
-                        generen a través de cada una. El
-                        efectivo siempre es una opción.
-                    </Text>
+                    <View style={{flex: 4, alignItems: 'center', paddingTop:100}}>
+                        <Image style={{ width: 148, height: 148 }} resizeMode='contain'
+                            source={require('./assets/img/welcome/screen2.png')} />
+                        <Text style={[styles.centralizedTitle, {marginTop: -12}]}>Agrega una cuenta{"\n"}o tarjeta</Text>
+                        <Text style={styles.centralizedParagraph}>
+                            Puedes agregar todas las cuentas
+                            y tarjetas que tengas para que
+                            registres las transacciones que se
+                            generen a través de cada una. El
+                            efectivo siempre es una opción.
+                        </Text>
+                    </View>
+                    <View style={{flex: 1}}>
+                       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                           <Text style={styles.textLink}>AGREGAR CUENTA</Text>
+                           <Text style={[styles.textLink, {marginLeft: 28}]}>SÓLO EFECTIVO</Text>
+                       </View>
+                    </View>
                 </View>
                 <View style={styles.slide}>
                 <Image
@@ -462,6 +467,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 20 
     },
+    textLink: {
+        color: '#078B75',
+        fontSize: 14,
+        fontWeight: '400',
+    },
     centralizedTitle: {
         color: '#000',
         fontSize: 30,
@@ -474,6 +484,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         padding: 12,
+        lineHeight: 30
     }
 });
 
