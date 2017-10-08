@@ -51,14 +51,9 @@ class Swipe extends React.Component {
         return (
             <Swiper style={styles.wrapper} showsButtons={false} loop={false}>
                 <View style={styles.slide}>
-                    <StatusBar
-                        hidden={true}
-                    />
-                    <Image
-                    style={{ width: 200, height: 100 }}
-                    resizeMode='contain'
-                    source={require('./assets/img/welcome/screen1.png')}
-                />
+                    <StatusBar hidden={true} />
+                    <Image style={{ width: 200, height: 100 }} resizeMode='contain'
+                           source={require('./assets/img/welcome/screen1.png')} />
                     <Text style={styles.centralizedTitle}>¡Te damos la{"\n"}bienvenida a Chelify!</Text>
                     <Text style={styles.centralizedParagraph}>
                         En breve, comenzarás a administrar
@@ -68,7 +63,7 @@ class Swipe extends React.Component {
                     </Text>
                 </View>
                 <View style={styles.slide}>
-                    <View style={{flex: 4, alignItems: 'center', paddingTop:100}}>
+                    <View style={{flex: 4, alignItems: 'center', paddingTop:120}}>
                         <Image style={{ width: 148, height: 148 }} resizeMode='contain'
                             source={require('./assets/img/welcome/screen2.png')} />
                         <Text style={[styles.centralizedTitle, {marginTop: -12}]}>Agrega una cuenta{"\n"}o tarjeta</Text>
@@ -88,34 +83,42 @@ class Swipe extends React.Component {
                     </View>
                 </View>
                 <View style={styles.slide}>
-                <Image
-                style={{ width: 200, height: 100 }}
-                resizeMode='contain'
-                source={require('./assets/img/welcome/screen3.png')}
-            />
-                    <Text style={styles.text}>Página 3</Text>
+                    <Image style={{ width: 200, height: 100 }} resizeMode='contain'
+                           source={require('./assets/img/welcome/screen3.png')} />
+                    <Text style={styles.centralizedTitle}>
+                        Genera reportes de{"\n"}tus gastos e ingresos
+                    </Text>
+                    <Text style={styles.centralizedParagraph}>
+                        La aplicación te permite generar
+                        reportes de tus transacciones, con
+                        la posibilidad de filtrarlos por fecha,
+                        cuentas, lugares, montos y categorías.
+                    </Text>
                 </View>
                 <View style={styles.slide}>
-                <Image
-                style={{ width: 200, height: 100 }}
-                resizeMode='contain'
-                source={require('./assets/img/welcome/screen4.png')}
-            />
-                    <Text style={styles.text}>Página 4</Text>
+                    <Image style={{ width: 200, height: 100 }} resizeMode='contain'
+                           source={require('./assets/img/welcome/screen4.png')} />
+                    <Text style={styles.centralizedTitle}>Colabora con otros{"\n"}usuarios</Text>
+                    <Text style={styles.centralizedParagraph}>
+                        Puedes ser miembro de un grupo
+                        para gastos comunes. Perfecto para
+                        hacer planes con familares, amigos
+                        o compañeros de trabajo.
+                    </Text>
                 </View>
                 <View style={styles.slide}>
-                <Image
-                style={{ width: 200, height: 100 }}
-                resizeMode='contain'
-                source={require('./assets/img/welcome/screen5.png')}
-            />
-                    <Text style={styles.text}>Página 5</Text>
-                    <Button
-                        style={styles.buttons}
-                        color="#24E189"
-                        onPress={() => this.props.navigation.dispatch(Principal.resetAction)}
-                        title="Comenzar"
-                    />
+                    <Image style={{ width: 200, height: 100 }} resizeMode='contain'
+                           source={require('./assets/img/welcome/screen5.png')} />
+                    <Text style={styles.centralizedTitle}>Configura pagos{"\n"}recurrentes</Text>
+                    <Text style={styles.centralizedParagraph}>
+                        Ciertos gastos o ingresos se realizan
+                        cada cierto tiempo. Puedes agregar
+                        esta recurrencia en la aplicación para
+                        evitar tener que registrarlo cada vez.
+                    </Text>
+                    <Text
+                        style={[styles.textLink, {paddingTop: 60}]}
+                        onPress={() => this.props.navigation.dispatch(Principal.resetAction)}>COMENZAR</Text>
                 </View>
             </Swiper>
         )
@@ -135,10 +138,7 @@ class TransactionsScreen extends React.Component {
     render() {
         return (
             <View>
-                <StatusBar
-                    backgroundColor="#2C2F33"
-                    barStyle="light-content"
-                />
+                <StatusBar backgroundColor="#2C2F33" barStyle="light-content" />
                 <Text>Transacciones</Text>
             </View>
         );
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     textLink: {
         color: '#078B75',
         fontSize: 14,
-        fontWeight: '400',
+        fontWeight: '400'
     },
     centralizedTitle: {
         color: '#000',
@@ -481,9 +481,9 @@ const styles = StyleSheet.create({
     },
     centralizedParagraph: {
         color: '#95989A',
-        fontSize: 20,
+        fontSize: 19,
         textAlign: 'center',
-        padding: 12,
+        padding: 15,
         lineHeight: 30
     }
 });
