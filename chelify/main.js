@@ -17,6 +17,7 @@ import {
     TouchableHighlight,
     Alert,
     TouchableOpacity,
+    Modal,
 } from 'react-native';
 import {
     Surface,
@@ -347,11 +348,16 @@ class Swipe extends React.Component {
                             efectivo siempre es una opción.
                         </Text>
                     </View>
-                    <View style={{ flex: 1 }}>
-                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
-                            <Text style={styles.textLink}>AGREGAR CUENTA</Text>
-                            <Text style={[styles.textLink, { marginLeft: 28 }]}>SÓLO EFECTIVO</Text>
-                        </View>
+                    <View style={{flex: 1}}>
+                       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                           <TouchableHighlight onPress={() => this.props.navigation.dispatch(Principal.resetAction)}>
+                               <Text style={styles.textLink}>AGREGAR CUENTA</Text>
+                           </TouchableHighlight>
+
+                           <TouchableHighlight style={{marginLeft: 28}} onPress={() => this.props.navigation.dispatch(Principal.resetAction)}>
+                               <Text style={styles.textLink}>SÓLO EFECTIVO</Text>
+                           </TouchableHighlight>
+                       </View>
                     </View>
                 </View>
                 <View style={styles.slide}>
@@ -388,12 +394,50 @@ class Swipe extends React.Component {
                         esta recurrencia en la aplicación para
                         evitar tener que registrarlo cada vez.
                     </Text>
-                    <Text
-                        style={[styles.textLink, { paddingTop: 60 }]}
-                        onPress={() => this.props.navigation.dispatch(Principal.resetAction)}>COMENZAR</Text>
+                    <TouchableHighlight onPress={() => this.props.navigation.dispatch(Principal.resetAction)}>
+                        <Text style={[styles.textLink, {paddingTop: 60}]}>COMENZAR</Text>
+                    </TouchableHighlight>
                 </View>
             </Swiper>
         )
+    }
+}
+
+class AddCardForm extends React.Component {
+
+    state = {
+        modalVisible: false,
+    }
+
+    setModalVisible(visible) {
+        this.setState({modalVisible: visible});
+    }
+
+    render() {
+        return (
+            <View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.modalVisible}
+                    onRequestClose={() => {alert("Modal has been closed.")}}>
+                    <View flex={1} style={styles.modalBoxBg}>
+                        <View flex={0.5} style={styles.modalBox }>
+                            <Text style={styles.centralizedTitle}>Agregar cuenta o tarjeta</Text>
+
+                            <TouchableHighlight onPress={() => { this.setModalVisible(!this.state.modalVisible) }}>
+                                <Text>Hide Modal</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                </Modal>
+
+                <TouchableHighlight onPress={() => { this.setModalVisible(true) }}>
+                    <Text>Show Modal</Text>
+                </TouchableHighlight>
+
+            </View>
+        );
     }
 }
 
@@ -786,6 +830,12 @@ class Principal extends React.Component {
     }
 }
 
+// const TestStack = StackNavigator({
+//     Test: {
+//         screen: AddCardForm
+//     }
+// })
+
 const OverviewStack = StackNavigator({
     Overview: {
         screen: OverviewScreen
@@ -862,6 +912,9 @@ const MyApp = TabNavigator({
 
 
 const ModalStack = StackNavigator({
+    // Test: {
+    //     screen: AddCardForm,
+    // },
     Home: {
         screen: Principal,
     },
@@ -1036,7 +1089,18 @@ const styles = StyleSheet.create({
     font:
         {
             fontFamily: 'Circular'
-        }
+        },
+    modalBox: {
+        backgroundColor: "white",
+        paddingHorizontal: 20,
+        paddingVertical: 16
+    },
+    modalBoxBg: {
+        backgroundColor: "rgba(52, 52, 52, 0.75)",
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    }
 });
 
 AppRegistry.registerComponent('chelifyreact', () => chelifyreact);
