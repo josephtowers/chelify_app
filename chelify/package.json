@@ -7,11 +7,32 @@
     "test": "jest"
   },
   "dependencies": {
-    "react": "16.0.0-alpha.12",
+    "@mapbox/react-native-mapbox-gl": "^6.0.0",
+    "art": "^0.10.1",
+    "chart.js": "^1.1.1",
+    "chartist": "^0.11.0",
+    "d3": "^4.11.0",
+    "d3-shape": "^1.2.0",
+    "react": "^16.0.0",
+    "react-chartist": "^0.13.0",
+    "react-chartjs": "^0.8.0",
+    "react-dom": "^16.0.0",
     "react-native": "0.48.3",
+    "react-native-chart": "^1.0.8-beta",
+    "react-native-elements": "^0.17.0",
+    "react-native-maps": "^0.13.1",
+    "react-native-svg": "^6.0.0-rc1",
     "react-native-swiper": "^1.5.12",
     "react-native-vector-icons": "^4.3.0",
-    "react-navigation": "^1.0.0-beta.11"
+    "react-navigation": "^1.0.0-beta.11",
+    "react-redux": "^5.0.6",
+    "react-router": "^4.2.0",
+    "react-router-native": "^4.2.0",
+    "react-router-navigation": "^1.0.0-rc.3",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0",
+    "victory-native": "^0.15.0"
   },
   "devDependencies": {
     "babel-jest": "21.0.2",
@@ -22,5 +43,10 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/"
+    ]
   }
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "807009438350",
+    "firebase_url": "https://chelifyco.firebaseio.com",
+    "project_id": "chelifyco",
+    "storage_bucket": "chelifyco.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807009438350:android:adb7e2eb080ba599",
+        "android_client_info": {
+          "package_name": "com.chelifyreact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807009438350-u5goe4uh45jpm42co7cl91to6nenpml0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chelifyreact",
+            "certificate_hash": "9d4bb12bda1ea719ab93bfb9eb9a245e6d9162af"
+          }
+        },
+        {
+          "client_id": "807009438350-tj4mttm16hq56ppjtl2h6oheaqivd1st.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6hqFfWyeo2PMXxLvfU-Mc3s3szdYrQKw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807009438350-tj4mttm16hq56ppjtl2h6oheaqivd1st.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
