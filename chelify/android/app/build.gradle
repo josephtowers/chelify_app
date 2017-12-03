@@ -72,6 +72,10 @@ import com.android.build.OutputFile
  * ]
  */
 
+project.ext.react = [
+    entryFile: "index.android.js"
+]
+
 apply from: "../../node_modules/react-native/react.gradle"
 
 /**
@@ -96,7 +100,7 @@ android {
     defaultConfig {
         applicationId "com.chelifyreact"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         ndk {
@@ -145,9 +149,11 @@ android {
 
 dependencies {
     compile project(':react-native-svg')
+    compile project(':@mapbox/react-native-mapbox-gl')
+    compile project(':react-native-maps')
     compile project(':react-native-vector-icons')
     compile fileTree(dir: "libs", include: ["*.jar"])
-    compile "com.android.support:appcompat-v7:24.0.1"
+    compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules
     
 }
@@ -158,5 +164,3 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
-
-//apply plugin: 'com.google.gms.google-services'
