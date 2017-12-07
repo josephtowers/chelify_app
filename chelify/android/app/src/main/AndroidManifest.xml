@@ -5,7 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-sdk
         android:minSdkVersion="16"
         android:targetSdkVersion="24" />
@@ -31,6 +32,10 @@
       <meta-data
       android:name="com.google.android.geo.API_KEY"
       android:value="AIzaSyDrTGuF8dVZziGToj9Q3cBv1k_CKivDTn4"/>
+      <meta-data android:name="com.bugsnag.android.API_KEY"
+             android:value="c73f13e3694f4894f3804ff7dbeaf29f"/>
+    <meta-data android:name="com.samsung.android.icon_container.has_icon_container" android:value="true"/>
+
     </application>
 
 </manifest>
