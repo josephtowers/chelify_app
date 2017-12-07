@@ -490,6 +490,13 @@ babel-plugin-transform-class-properties@^6.18.0, babel-plugin-transform-class-pr
     babel-runtime "^6.22.0"
     babel-template "^6.24.1"
 
+babel-plugin-transform-define@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-define/-/babel-plugin-transform-define-1.3.0.tgz#94c5f9459c810c738cc7c50cbd44a31829d6f319"
+  dependencies:
+    lodash "4.17.4"
+    traverse "0.6.6"
+
 babel-plugin-transform-es2015-arrow-functions@^6.5.0, babel-plugin-transform-es2015-arrow-functions@^6.8.0:
   version "6.22.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-es2015-arrow-functions/-/babel-plugin-transform-es2015-arrow-functions-6.22.0.tgz#452692cb711d5f79dc7f85e440ce41b9f244d221"
@@ -997,6 +1004,13 @@ bser@^2.0.0:
   resolved "https://registry.yarnpkg.com/bser/-/bser-2.0.0.tgz#9ac78d3ed5d915804fd87acb158bc797147a1719"
   dependencies:
     node-int64 "^0.4.0"
+
+bugsnag-react-native@^2.7.5:
+  version "2.7.5"
+  resolved "https://registry.yarnpkg.com/bugsnag-react-native/-/bugsnag-react-native-2.7.5.tgz#a9c6474faba0c65d50951cbe335908a3f83cc71a"
+  dependencies:
+    promise "^7"
+    prop-types "^15.6.0"
 
 builtin-modules@^1.0.0:
   version "1.1.1"
@@ -2218,7 +2232,7 @@ hoist-non-react-statics@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-1.2.0.tgz#aa448cf0986d55cc40773b17174b7dd066cb7cfb"
 
-hoist-non-react-statics@^2.2.0, hoist-non-react-statics@^2.2.1, hoist-non-react-statics@^2.3.0:
+hoist-non-react-statics@^2.2.0, hoist-non-react-statics@^2.2.1, hoist-non-react-statics@^2.3.0, hoist-non-react-statics@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.3.1.tgz#343db84c6018c650778898240135a1420ee22ce0"
 
@@ -3019,6 +3033,10 @@ lodash.isempty@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/lodash.isempty/-/lodash.isempty-4.4.0.tgz#6f86cbedd8be4ec987be9aaf33c9684db1b31e7e"
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+
 lodash.keys@^3.0.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/lodash.keys/-/lodash.keys-3.1.2.tgz#4dbc0472b156be50a0b286855d1bd0b0c656098a"
@@ -3072,13 +3090,13 @@ lodash.times@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/lodash.times/-/lodash.times-4.3.2.tgz#3e1f2565c431754d54ab57f2ed1741939285ca1d"
 
+lodash@4.17.4, lodash@^4.0.0, lodash@^4.14.0, lodash@^4.16.6, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1:
+  version "4.17.4"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+
 lodash@^3.5.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
-
-lodash@^4.0.0, lodash@^4.14.0, lodash@^4.16.6, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1:
-  version "4.17.4"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
 longest@^1.0.1:
   version "1.0.1"
@@ -3260,6 +3278,16 @@ minimist@~0.0.1:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+mobx-react@^4.3.4:
+  version "4.3.5"
+  resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-4.3.5.tgz#76853f2f2ef4a6f960c374bcd9f01e875929c04c"
+  dependencies:
+    hoist-non-react-statics "^2.3.1"
+
+mobx@^3.3.1:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/mobx/-/mobx-3.4.0.tgz#b97f98d973d1be26d185d3cfc78053dd4829ec95"
 
 morgan@~1.6.1:
   version "1.6.1"
@@ -3613,6 +3641,10 @@ path-to-regexp@^1.7.0:
   dependencies:
     isarray "0.0.1"
 
+path-to-regexp@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-2.1.0.tgz#7e30f9f5b134bd6a28ffc2e3ef1e47075ac5259b"
+
 path-type@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-1.1.0.tgz#59c44f7ee491da704da415da5a4070ba4f8fe441"
@@ -3705,7 +3737,7 @@ process@~0.5.1:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/process/-/process-0.5.2.tgz#1638d8a8e34c2f440a91db95ab9aeb677fc185cf"
 
-promise@^7.1.1:
+promise@^7, promise@^7.1.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/promise/-/promise-7.3.1.tgz#064b72602b18f90f29192b8b1bc418ffd1ebd3bf"
   dependencies:
@@ -3818,6 +3850,12 @@ react-native-action-button@^2.8.2:
   dependencies:
     prop-types "^15.5.10"
 
+react-native-animatable@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.2.4.tgz#b5fb7657e8f6edadbc26697057a327fb920b3039"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-chart@^1.0.8-beta:
   version "1.0.8-beta"
   resolved "https://registry.yarnpkg.com/react-native-chart/-/react-native-chart-1.0.8-beta.tgz#c34b50ffe7f2acd6f519d614a134a7cd29135766"
@@ -3826,6 +3864,13 @@ react-native-chart@^1.0.8-beta:
     babel-eslint "^6.0.0"
     babel-plugin-transform-flow-strip-types "^6.8.0"
     babel-preset-react-native "^1.5.3"
+
+react-native-circular-progress@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-circular-progress/-/react-native-circular-progress-0.1.0.tgz#046d182a4851f75742f56b1f05fdab28cac2d0ed"
+  dependencies:
+    art "^0.10.1"
+    prop-types "^15.6.0"
 
 react-native-collapsible@^0.9.0:
   version "0.9.0"
@@ -3860,6 +3905,17 @@ react-native-elements@^0.17.0:
     react-native-side-menu "^1.0.2"
     react-native-tab-navigator "^0.3.4"
 
+react-native-gesture-handler@^1.0.0-alpha.35:
+  version "1.0.0-alpha.35"
+  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.0.0-alpha.35.tgz#c16cf97151223cb8d4902d6dd597dc1612d8cb33"
+  dependencies:
+    invariant "^2.2.2"
+    prop-types "^15.5.10"
+
+react-native-image-picker@^0.26.7:
+  version "0.26.7"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-0.26.7.tgz#ad2ee957f7f6cc01396893ea03d84cb2adb2e376"
+
 react-native-maps@^0.17.1:
   version "0.17.1"
   resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-0.17.1.tgz#ab2236341fd984dac8864202ae55331bc262f60c"
@@ -3869,6 +3925,18 @@ react-native-parallax-scroll-view@^0.20.1:
   resolved "https://registry.yarnpkg.com/react-native-parallax-scroll-view/-/react-native-parallax-scroll-view-0.20.1.tgz#7fad3411df8632b7c99fed5d0a5c0a8f97007b38"
   dependencies:
     prop-types "^15.6.0"
+
+react-native-router-flux@^4.0.0-beta.24:
+  version "4.0.0-beta.24"
+  resolved "https://registry.yarnpkg.com/react-native-router-flux/-/react-native-router-flux-4.0.0-beta.24.tgz#93fb1976688bd6e34f73b2ae6764704efb7bcdd5"
+  dependencies:
+    lodash.isequal "^4.5.0"
+    mobx "^3.3.1"
+    mobx-react "^4.3.4"
+    opencollective "^1.0.3"
+    path-to-regexp "^2.1.0"
+    prop-types "^15.6.0"
+    react-navigation "^1.0.0-beta.19"
 
 react-native-side-menu@^1.0.2:
   version "1.1.3"
@@ -3907,6 +3975,18 @@ react-native-tab-view@^0.0.67:
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-0.0.67.tgz#cdd146fe5e5d4baff6c89f2d5d0b15fa23db39d0"
   dependencies:
     prop-types "^15.5.8"
+
+react-native-tab-view@^0.0.70:
+  version "0.0.70"
+  resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-0.0.70.tgz#1dd2ded32acd0cb6bfef38d26e53675db733b37b"
+  dependencies:
+    prop-types "^15.5.10"
+
+react-native-tab-view@^0.0.73:
+  version "0.0.73"
+  resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-0.0.73.tgz#698dc8864b045edda7e8706d612d4e1877305bbf"
+  dependencies:
+    prop-types "^15.6.0"
 
 react-native-vector-icons@^4.3.0:
   version "4.4.0"
@@ -3995,6 +4075,18 @@ react-navigation@^1.0.0-beta.11:
     prop-types "^15.5.10"
     react-native-drawer-layout-polyfill "^1.3.2"
     react-native-tab-view "^0.0.67"
+
+react-navigation@^1.0.0-beta.19:
+  version "1.0.0-beta.21"
+  resolved "https://registry.yarnpkg.com/react-navigation/-/react-navigation-1.0.0-beta.21.tgz#086c504ba84c966ef8db898baef6fa14ff45a06f"
+  dependencies:
+    babel-plugin-transform-define "^1.3.0"
+    clamp "^1.0.1"
+    hoist-non-react-statics "^2.2.0"
+    path-to-regexp "^1.7.0"
+    prop-types "^15.5.10"
+    react-native-drawer-layout-polyfill "^1.3.2"
+    react-native-tab-view "^0.0.70"
 
 react-proxy@^1.1.7:
   version "1.1.8"
@@ -4750,6 +4842,10 @@ tough-cookie@^2.3.2, tough-cookie@~2.3.0:
 tr46@~0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
+
+traverse@0.6.6:
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/traverse/-/traverse-0.6.6.tgz#cbdf560fd7b9af632502fed40f918c157ea97137"
 
 trim-right@^1.0.1:
   version "1.0.1"
