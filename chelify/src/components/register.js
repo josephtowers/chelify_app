@@ -8,7 +8,8 @@ import {
     Image,
     TextInput,
     Button,
-    ToastAndroid
+    ToastAndroid,
+    KeyboardAvoidingView
 } from 'react-native'
 
 const baseUrl = 'http://10.6.250.129:8000';
@@ -80,6 +81,7 @@ export class Register extends React.Component {
                         underlineColorAndroid="#787878"
                         onChangeText={(email) => this.setState({ email })}
                         value={this.state.email}
+                        autoCapitalize="none"
                     />
                     <TextInput
                         style={styles.inputs}
@@ -87,6 +89,7 @@ export class Register extends React.Component {
                         placeholder="Repetir correo electrónico"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
+                        autoCapitalize="none"
                     />
                     <TextInput
                         style={styles.inputs}
@@ -96,6 +99,7 @@ export class Register extends React.Component {
                         underlineColorAndroid="#787878"
                         onChangeText={(password) => this.setState({ password })}
                         value={this.state.password}
+                        autoCapitalize="none"
                     />
                     <TextInput
                         style={styles.inputs}
@@ -103,13 +107,14 @@ export class Register extends React.Component {
                         placeholder="Repetir contraseña"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
+                        autoCapitalize="none"
                     />
                 </View>
                 <View style={styles.buttonsContainer}>
                     <Button
                         style={styles.buttons}
                         color="#24E189"
-                        onPress={() => this.userLogin()}
+                        onPress={() => this.props.navigation.dispatch(this.resetAction)}
                         title="Crear cuenta"
                     />
                 </View>

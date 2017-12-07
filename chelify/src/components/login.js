@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import { NavigationActions } from 'react-navigation'
 import styles from '../styles/style.js'
+import * as Animatable from 'react-native-animatable'
 import {
     View,
     Text,
     StatusBar,
     Image,
     TextInput,
-    Button
+    Button,
+    Dimensions
 } from 'react-native'
 
 export class Login extends React.Component {
@@ -27,11 +29,15 @@ export class Login extends React.Component {
                     backgroundColor="#2C2F33"
                     barStyle="light-content"
                 />
-                <Image
+                
+                <Animatable.Image
+                animation="bounceIn"
                     style={{ width: 200, height: 100 }}
                     resizeMode='contain'
                     source={require('../../assets/img/logo.png')}
                 />
+                <Animatable.View style={{width: Dimensions.get('window').width}} animation="fadeInUpBig" 
+                delay={1000}>
                 <View style={{ alignSelf: 'stretch', paddingHorizontal: 20 }}>
                     <TextInput
                         style={styles.inputs}
@@ -39,6 +45,7 @@ export class Login extends React.Component {
                         placeholder="Correo electrónico"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
+                        autoCapitalize="none"
                     />
                     <TextInput
                         style={styles.inputs}
@@ -46,6 +53,7 @@ export class Login extends React.Component {
                         placeholder="Contraseña"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
+                        autoCapitalize="none"
                     />
                 </View>
                 <View style={styles.buttonsContainer}>
@@ -62,6 +70,7 @@ export class Login extends React.Component {
                         title="Nueva cuenta"
                     />
                 </View>
+                </Animatable.View>
             </View>
 
         );

@@ -4,6 +4,7 @@ import ReportsStack from './reports.js'
 import GroupsStack from './groups.js'
 import OptionsStack from './options.js'
 import { TabNavigator } from 'react-navigation'
+import { ToastAndroid } from 'react-native'
 
 export const TabView = TabNavigator({
     Overview: {
@@ -29,6 +30,7 @@ export const TabView = TabNavigator({
 }, {
         tabBarPosition: 'bottom',
         swipeEnabled: false,
+        animationEnabled: true,
         tabBarOptions: {
             style:
                 {

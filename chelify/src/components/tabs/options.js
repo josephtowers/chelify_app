@@ -3,7 +3,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../../styles/style.js'
 import { Text, View } from 'react-native'
 import { StackNavigator, NavigationActions } from 'react-navigation';
-
+import { connect } from 'react-redux'
 export class Options extends React.Component {
     
         static navigationOptions = {
@@ -15,6 +15,8 @@ export class Options extends React.Component {
             ),
         }
         render() {
+            const { transactions } = this.props;
+            console.log(transactions);
             return (
                 <View>
                     <Text>Opciones</Text>
@@ -23,9 +25,13 @@ export class Options extends React.Component {
         }
 }
 
+const mapStateToProps = (state) => ({
+    transactions: state.transactions
+});
+
     const OptionsStack = StackNavigator({
         Options: {
-            screen: Options
+            screen:connect(mapStateToProps)(Options)
         }
     })
     

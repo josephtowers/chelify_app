@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 export const styles = StyleSheet.create({
         header:
@@ -14,8 +14,21 @@ export const styles = StyleSheet.create({
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#2C2F33',
-    
+            width: Dimensions.get('window').width
         },
+        points: {
+            backgroundColor: 'transparent',
+            position: 'absolute',
+        flexDirection: 'row',
+            top: 41,
+            left: 32,
+            fontFamily: 'Circular',
+            width: 52,
+            textAlign: 'center',
+            color: '#24E189',
+            fontSize: 20,
+            fontWeight: "100"
+          },
         buttonsContainer: {
             alignSelf: 'stretch',
             flexDirection: "row",
@@ -120,6 +133,17 @@ export const styles = StyleSheet.create({
             width: 16,
             height: 16,
             borderRadius: 16 / 2,
+            marginHorizontal: 10,
+            marginVertical: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: 'white'
+        },
+        circleMedium: {
+            width: 30,
+            height: 30,
+            borderRadius: 30 / 2,
             marginHorizontal: 10,
             marginVertical: 5,
             justifyContent: 'center',

@@ -38,6 +38,7 @@ import {
     FormValidationMessage,
     Divider
 } from 'react-native-elements';
+import { connect } from 'react-redux'
 import ParallaxScroll from '@monterosa/react-native-parallax-scroll';
 
 const payments = [
@@ -168,11 +169,12 @@ const categories = [
 
 ];
 
-state = {
-    trans: transactions
-}
 
 export class Transactions extends React.Component {
+
+    constructor(props) {
+        super(props);
+    }
     static navigationOptions = {
         title: 'Transacciones',
         headerStyle: { backgroundColor: '#2C2F33' },
@@ -181,11 +183,12 @@ export class Transactions extends React.Component {
             <Icon name="credit-card" size={15} color="#FFF" />
         ),
     }
+    
     getInitialState() {
         // This assumes your external thing is written by someone who was
         // smart enough to not allow direct manipulation, but made sure
         // to use API functions that allow for event handling etc.
-        return { trans: transactions } 
+        return { trans: transactions, refreshing: false } 
       }
     state = {
          trans: transactions,
@@ -217,14 +220,16 @@ export class Transactions extends React.Component {
     }
 
     render() {
+        
         return (
+
             this.state.trans.length > 0 ? (
-                <View>
+                <View style={{flex: 1}}>
                     <ScrollView
                     refreshControl={<RefreshControl
                         enabled={true}
                         refreshing={this.state.refreshing}
-                        onRefresh={this._onRefresh.bind(this)}
+                        onRefresh={() => (this._onRefresh.bind(this))}
                       />}>
                         <StatusBar backgroundColor="#2C2F33" barStyle="light-content" />
                         {
@@ -338,7 +343,7 @@ export class AddTransaction extends React.Component {
             // Make a new timeout set to go off in 800ms
             this.timeout = setTimeout(function () {
             changeLocationStateToTrue();
-                fetch("https://maps.googleapis.com/maps/api/place/textsearch/json?key=AIzaSyDrTGuF8dVZziGToj9Q3cBv1k_CKivDTn4&location=18.4874874,-69.9645857&radius=50000&query="+query, {
+                fetch("https://maps.googleapis.com/maps/api/place/textsearch/json?key=AIzaSyCjcuW_DPA0pRKBTvkJjDqapNshQH1Mrss&location=18.4874874,-69.9645857&radius=50000&query="+query, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -461,7 +466,8 @@ export class AddTransaction extends React.Component {
                 parallaxHeight={500}
       renderParallaxForeground={() => (
         <View style={{ height:500, zIndex: 0, alignItems: 'center', justifyContent: 'center', zIndex: -100 }}>
-           <Text style={{fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10}}>RD${this.state.formattedAmount}</Text>
+        <Text style={{color:'white', fontFamily: 'Circular',marginBottom:3}}>Monto de la transacción:</Text>      
+        <Text style={{fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10}}>RD${this.state.formattedAmount}</Text>
            <View>
            <View style={{flexDirection: 'row'}}>
            <TouchableOpacity onPress={() => this.changeAmount(1)}>
@@ -759,7 +765,7 @@ export class EditTransaction extends React.Component {
                 // Make a new timeout set to go off in 800ms
                 this.timeout = setTimeout(function () {
                 changeLocationStateToTrue();
-                    fetch("https://maps.googleapis.com/maps/api/place/textsearch/json?key=AIzaSyDrTGuF8dVZziGToj9Q3cBv1k_CKivDTn4&location=18.4874874,-69.9645857&radius=50000&query="+query, {
+                    fetch("https://maps.googleapis.com/maps/api/place/textsearch/json?key=AIzaSyCjcuW_DPA0pRKBTvkJjDqapNshQH1Mrss&location=18.4874874,-69.9645857&radius=50000&query="+query, {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -817,7 +823,6 @@ export class EditTransaction extends React.Component {
             
                 let amount = parseFloat(amountIn).toFixed(2);
                // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-                console.log(amount);
                 let splitAmount = amount.split(".")[0];
                 let i = splitAmount.length-4;
             

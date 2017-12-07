@@ -4,6 +4,11 @@ import Register from './register.js'
 import Passcode from './passcode.js'
 import { StackNavigator } from 'react-navigation'
 import TabView from './tabs'
+import { Provider, connect } from 'react-redux';
+import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
+import thunkMiddleware from 'redux-thunk'
+import createLogger from 'redux-logger'
+
 
 const Root = StackNavigator({
     // Test: {
