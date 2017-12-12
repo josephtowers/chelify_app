@@ -1,3 +1,4 @@
+import React, { Component } from 'react'
 import Login from './login.js'
 import Welcome from './welcome.js'
 import Register from './register.js'
@@ -24,7 +25,7 @@ const Root = StackNavigator({
         screen: Passcode
     },
     Start: {
-        screen: TabView,
+        screen: ({navigation}) => <TabView screenProps={{rootNavigation: navigation}} />,
         navigationOptions: {
             header: null
         }

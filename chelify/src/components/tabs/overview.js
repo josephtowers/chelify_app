@@ -16,6 +16,13 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../../styles/style.js'
 var ImagePicker = require('react-native-image-picker');
+import users from '../../api/users.js'
+import {
+    VictoryChart,
+    VictoryLine,
+    VictoryTheme,
+    VictoryContainer
+} from 'victory-native'
 
 const assets = [
     {
@@ -60,7 +67,7 @@ export class Overview extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            avatarSource: require('../../../assets/img/add-picture.jpg')
+            avatarSource: { uri: 'https://randomuser.me/api/portraits/men/36.jpg' }
         }
     }
     static navigationOptions = {
@@ -74,36 +81,38 @@ export class Overview extends React.Component {
     options = {
         title: 'Seleccionar foto de perfil',
         storageOptions: {
-          skipBackup: true,
-          path: 'images'
+            skipBackup: true,
+            path: 'images'
         }
-      };
+    };
 
-      selectImage() {
+    selectImage() {
         ImagePicker.showImagePicker(this.options, (response) => {
             console.log('Response = ', response);
-          
+
             if (response.didCancel) {
-              console.log('User cancelled image picker');
+                console.log('User cancelled image picker');
             }
             else if (response.error) {
-              console.log('ImagePicker Error: ', response.error);
+                console.log('ImagePicker Error: ', response.error);
             }
             else if (response.customButton) {
-              console.log('User tapped custom button: ', response.customButton);
+                console.log('User tapped custom button: ', response.customButton);
             }
             else {
-              let source = { uri: response.uri };
-          
-              // You can also display the image using data:
-              // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-          
-              this.setState({
-                avatarSource: source
-              });
+                let source = { uri: response.uri };
+
+                // You can also display the image using data:
+                // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    avatarSource: source
+                }, function () {
+                    users[1].image = source;
+                });
             }
-          });
-      }
+        });
+    }
     render() {
         return (
             <ScrollView contentContainerStyle={{ alignItems: 'center', alignSelf: 'stretch', backgroundColor: '#FFF' }}>
@@ -111,20 +120,49 @@ export class Overview extends React.Component {
 
                 </View>
                 <View style={{ bottom: 70, backgroundColor: 'transparent', alignSelf: 'stretch', alignItems: 'center' }}>
-                <TouchableNativeFeedback onPress={() => this.selectImage()}>     
-                <Image
-                        style={{ width: 140, height: 140, borderRadius: 140 / 2 }}
-                        resizeMode='cover'
-                        source={this.state.avatarSource}
-                        
-                    />
+                    <TouchableNativeFeedback onPress={() => this.selectImage()}>
+                        <Image
+                            style={{ width: 140, height: 140, borderRadius: 140 / 2 }}
+                            resizeMode='cover'
+                            source={this.state.avatarSource}
+
+                        />
                     </TouchableNativeFeedback>
-                    <Text style={[{ color: '#000', fontSize: 20 }, styles.font]}>Jane Doe</Text>
+                    <Text style={[{ color: '#000', fontSize: 20 }, styles.font]}>Roberto Mercedes</Text>
                     <View>
                         <View style={{ alignSelf: 'stretch', alignItems: 'flex-start' }}>
-                            <Text style={{ marginLeft: 20, fontSize: 18, fontFamily: 'Circular' }}>Resumen del mes de Octubre</Text>
+                            <Text style={{ marginLeft: 20, fontSize: 18, fontFamily: 'Circular' }}>Resumen del mes de Diciembre</Text>
                         </View>
                     </View>
+                    <VictoryChart
+                        theme={VictoryTheme.material}
+                        containerComponent={<VictoryContainer
+                            onTouchStart={() => this.setState({ scrollEnabled: true })}
+                            onTouchEnd={() => this.setState({ scrollEnabled: true })}
+                        />}
+                        animate={{
+                            duration: 2000,
+                            onLoad: { duration: 1000 }
+                        }}
+                    >
+                        <VictoryLine
+                            style={{
+                                data: { stroke: "#c43a31" },
+                                parent: { border: "1px solid #ccc" }
+                            }}
+                            animate={{
+                                duration: 2000,
+                                onLoad: { duration: 1000 }
+                            }}
+                            data={[
+                                { x: 1, y: 2 },
+                                { x: 2, y: 3 },
+                                { x: 3, y: 5 },
+                                { x: 4, y: 4 },
+                                { x: 5, y: 7 }
+                            ]}
+                        />
+                    </VictoryChart>
                     <View style={{ alignSelf: 'stretch', alignItems: 'flex-start' }}>
                         <Text style={{ marginLeft: 20, fontSize: 18, fontFamily: 'Circular' }}>Activos</Text>
                     </View>

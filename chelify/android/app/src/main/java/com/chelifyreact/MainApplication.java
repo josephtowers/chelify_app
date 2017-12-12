@@ -13,6 +13,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.mapbox.rctmgl.RCTMGLPackage;
+import com.horcrux.svg.SvgPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +35,8 @@ public class MainApplication extends Application implements ReactApplication {
             new ImagePickerPackage(),
             new VectorIconsPackage(),
             new MapsPackage(),
-            new RCTMGLPackage()
+            new RCTMGLPackage(),
+            new SvgPackage()
       );
     }
   };
