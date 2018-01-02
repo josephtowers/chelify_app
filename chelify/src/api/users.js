@@ -48,23 +48,25 @@ const baseUrl = 'http://chelify.com';
 const loginApi = baseUrl + '/auth/login';
 
 export function login(email, password) {
-    let a = fetch(loginApi, {
+    fetch(loginApi, {
         method: 'POST',
-        // headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json',
-        // },
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
             email: email,
-            password: password,
+            password: password
         })
-    })//.then(checkStatus)
-        .then(response => response.json())
+    }).then((response) => response.json())
         .then((responseJson) => {
+            ToastAndroid.show('El usuario ta jevi', ToastAndroid.SHORT);
             console.log(responseJson);
         })
-        .catch(e => e);
-    console.log(a);
+        .catch((error) => {
+            ToastAndroid.show(error.message, ToastAndroid.SHORT);
+
+        });
 }
 
 export function checkStatus(response) {

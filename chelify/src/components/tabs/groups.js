@@ -179,7 +179,7 @@ export class GroupDetails extends React.Component {
     }
 
     updateAll(newBalance, user) {
-        this.setState({balance: this.state.balance + newBalance}, function() {
+        this.setState({ balance: this.state.balance + newBalance }, function () {
             let val = groups.indexOf(this.state.data);
             groups[val].balance = this.state.balance;
             groups[val].transactions.push({
@@ -252,7 +252,7 @@ export class GroupTransactions extends React.Component {
         }
     }
     backAction = NavigationActions.back();
-    
+
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
@@ -273,22 +273,23 @@ export class GroupTransactions extends React.Component {
     }
     changeAmount = number => {
         number === 10 ? (
-            this.setState({amount: 0}, () => this.setState({formattedAmount: this.cashify(this.state.amount)}))
+            this.setState({ amount: 0 }, () => this.setState({ formattedAmount: this.cashify(this.state.amount) }))
+        )
+            : (
+                ((this.state.amount * 1000) + number) * 0.01 <= 9999999.99 ? (
+                    this.setState({ amount: ((this.state.amount * 1000) + number) * 0.01 }, function () {
+                        this.setState({ formattedAmount: this.cashify(this.state.amount) });
+                    })) : (
+                        this.setState({ amount: 9999999.99 }, function () {
+                            this.setState({ formattedAmount: this.cashify(this.state.amount) });
+                        }))
             )
-        : (
-            ((this.state.amount * 1000) + number) * 0.01 <= 9999999.99 ? (
-        this.setState({amount : ((this.state.amount * 1000) + number) * 0.01 }, function() {
-            this.setState({formattedAmount: this.cashify(this.state.amount)});
-        })   ) : (
-            this.setState({amount : 9999999.99 }, function() {
-                this.setState({formattedAmount: this.cashify(this.state.amount)});
-            })   )      
-    )}
+    }
     pushInput() {
         this.props.screenProps.changeMe(this.state.amount, users[1]);
-        this.setState({amount: 0, formattedAmount: '0.00'}, function() {
+        this.setState({ amount: 0, formattedAmount: '0.00' }, function () {
             let val = groups.indexOf(this.state.data)
-            this.setState({data: groups[val]})
+            this.setState({ data: groups[val] })
         })
         this.setModalVisible(false)
     }
@@ -297,89 +298,89 @@ export class GroupTransactions extends React.Component {
         return (
             <View style={{ flex: 1 }}>
                 <ScrollView>
-                <Modal
-                transparent={true}
-                animationType="slide"
-                visible={this.state.modalVisible}
-                onRequestClose={() => { this.setModalVisible(!this.state.modalVisible) }}>
-                <View style={{ flex: 1, alignItems: 'center', backgroundColor: 'rgba(44, 47, 51, 0.9)', justifyContent: 'center'}}>
-                <Text style={{color:'white', fontFamily: 'Circular',marginBottom:3}}>Monto del aporte:</Text>      
-                <Text style={{fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10}}>RD${this.state.formattedAmount}</Text>
-                <View style={{marginBottom: 15}}>
-                <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity onPress={() => this.changeAmount(1)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>1</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.changeAmount(2)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>2</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.changeAmount(3)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>3</Text></View>
-                </TouchableOpacity>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity  onPress={() => this.changeAmount(4)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>4</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.changeAmount(5)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>5</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.changeAmount(6)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>6</Text></View>
-                </TouchableOpacity>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity  onPress={() => this.changeAmount(7)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>7</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.changeAmount(8)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>8</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.changeAmount(9)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>9</Text></View>
-                </TouchableOpacity>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity>
-                <View style={styles.circleBlank}></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.changeAmount(0)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>0</Text></View>
-                </TouchableOpacity>
-                <TouchableOpacity  onPress={() => this.changeAmount(10)}>
-                <View style={styles.circleBlank}><Text style={{color: 'white', fontFamily: 'Circular', fontSize: 30}}>{"x"}</Text></View>
-                </TouchableOpacity>
-                </View>
-                </View>
-                <Button
-                style={[styles.buttons, {marginTop: 15}]}
-                color="#24E189"
-                onPress={() => this.pushInput()}
-                title="Aceptar"
-            />
-              </View>
-             </Modal>
+                    <Modal
+                        transparent={true}
+                        animationType="slide"
+                        visible={this.state.modalVisible}
+                        onRequestClose={() => { this.setModalVisible(!this.state.modalVisible) }}>
+                        <View style={{ flex: 1, alignItems: 'center', backgroundColor: 'rgba(44, 47, 51, 0.9)', justifyContent: 'center' }}>
+                            <Text style={{ color: 'white', fontFamily: 'Circular', marginBottom: 3 }}>Monto del aporte:</Text>
+                            <Text style={{ fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10 }}>RD${this.state.formattedAmount}</Text>
+                            <View style={{ marginBottom: 15 }}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(1)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>1</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(2)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>2</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(3)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>3</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(4)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>4</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(5)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>5</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(6)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>6</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(7)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>7</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(8)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>8</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(9)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>9</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity>
+                                        <View style={styles.circleBlank}></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(0)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>0</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(10)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>{"x"}</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                            <Button
+                                style={[styles.buttons, { marginTop: 15 }]}
+                                color="#24E189"
+                                onPress={() => this.pushInput()}
+                                title="Aceptar"
+                            />
+                        </View>
+                    </Modal>
                     <List>
                         {
                             data.transactions.reverse().map((l, i) => (
                                 <ListItem
-                                key={i}
-                                hideChevron={true}
+                                    key={i}
+                                    hideChevron={true}
                                     roundAvatar
                                     avatar={l.user.image}
-                                    rightTitleStyle={{fontWeight: "100", fontFamily: 'Circular'}}
+                                    rightTitleStyle={{ fontWeight: "100", fontFamily: 'Circular' }}
                                     fontFamily={"Circular"}
                                     title={l.user.name}
-                                    rightTitle={"RD$"+this.cashify(l.amount)}
+                                    rightTitle={"RD$" + this.cashify(l.amount)}
                                 />
                             ))
                         }
                     </List>
                 </ScrollView>
                 <ActionButton
-                buttonColor="#24E189"
-                onPress={() => this.setModalVisible(true)}
-            />
+                    buttonColor="#24E189"
+                    onPress={() => this.setModalVisible(true)}
+                />
             </View>
         )
     }

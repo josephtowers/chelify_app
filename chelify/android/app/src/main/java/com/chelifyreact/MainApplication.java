@@ -3,6 +3,7 @@ package com.chelifyreact;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.beefe.picker.PickerViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.bugsnag.BugsnagReactNative;
 import com.imagepicker.ImagePickerPackage;
@@ -30,6 +31,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new PickerViewPackage(),
             new RNGestureHandlerPackage(),
             BugsnagReactNative.getPackage(),
             new ImagePickerPackage(),

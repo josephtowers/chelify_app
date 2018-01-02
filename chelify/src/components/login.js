@@ -9,7 +9,9 @@ import {
     Image,
     TextInput,
     Button,
-    Dimensions
+    Dimensions,
+    AsyncStorage,
+    ToastAndroid
 } from 'react-native'
 import {login} from '../api/users';
 
@@ -26,7 +28,21 @@ export class Login extends React.Component {
     static navigationOptions = {
         header: null,
     }
-
+    async checkForPasscode() {
+        try {
+            let value = await AsyncStorage.getItem('passcode');
+            if (value !== null){
+              this.props.navigation.dispatch(Login.goToPasscodePage)
+            }
+          } catch (error) {
+            // Error retrieving data
+            console.log('2value');
+            
+          }
+    }
+    componentDidMount() {
+        this.checkForPasscode()
+    }
     loginAction = function() {
         login(this.state.email, this.state.password)
     }
@@ -38,6 +54,12 @@ export class Login extends React.Component {
         ]
     })
 
+    static goToPasscodePage = NavigationActions.reset({
+        index: 0,
+        actions: [
+            NavigationActions.navigate({ routeName: 'Passcode' })
+        ]
+    })
     render() {
         return (
             <View style={styles.container}>
@@ -80,7 +102,7 @@ export class Login extends React.Component {
                     <Button
                         style={styles.buttons}
                         color="#24E189"
-                        onPress={() => this.loginAction()}
+                        onPress={() => this.props.navigation.dispatch(Login.resetAction)}
                         title="Iniciar sesión"
                     />
                     <Button

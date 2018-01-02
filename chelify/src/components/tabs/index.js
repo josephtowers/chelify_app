@@ -30,7 +30,7 @@ export const TabView = TabNavigator({
 }, {
         tabBarPosition: 'bottom',
         swipeEnabled: false,
-        animationEnabled: true,
+        animationEnabled: false,
         tabBarOptions: {
             style:
                 {

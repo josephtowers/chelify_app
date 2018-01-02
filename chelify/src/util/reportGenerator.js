@@ -1,19 +1,9 @@
-import {
-    VictoryChart,
-    VictoryArea,
-    VictoryScatter,
-    VictoryStack,
-    VictoryBar,
-    VictoryPie,
-    VictoryLine,
-    VictoryTheme
-} from 'victory-native'
+import React, { Component } from 'react';
 import {
     View,
     Text,
     Alert
 } from 'react-native'
-import React, { Component } from 'react';
 import transactions from '../api/transactions'
 
 let data = {
@@ -23,15 +13,6 @@ let data = {
     var2: "categories",
     date: "last-six-months"
 }
-
-Array.prototype.fuck = function(){
-
-}
-
-export function getAreaChart() {
-
-}
-
 export const generate = (text) => {
     let dataset = data;
     let sortBy = []

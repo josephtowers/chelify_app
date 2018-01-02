@@ -41,24 +41,7 @@ import {
 import { connect } from 'react-redux'
 import ParallaxScroll from '@monterosa/react-native-parallax-scroll';
 import transactions from '../../api/transactions'
-const payments = [
-    {
-        name: "Efectivo",
-        avatar: require('../../../assets/img/icons/details/funds.png')
-    },
-    {
-        name: "Tarjeta de crédito VISA 2215",
-        avatar: require('../../../assets/img/icons/visa.png')
-    },
-    {
-        name: "Tarjeta de crédito AMEX 5022",
-        avatar: require('../../../assets/img/icons/amex.png')
-    },
-    {
-        name: "Tarjeta de crédito MC 3977",
-        avatar: require('../../../assets/img/icons/mastercard.png')
-    }
-]
+import payments from '../../api/payments'
 
 const categories = [
     {
@@ -118,7 +101,6 @@ export class Transactions extends React.Component {
 
         let amount = parseFloat(amountIn).toFixed(2);
         // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-        console.log(amount);
         let splitAmount = amount.split(".")[0];
         let i = splitAmount.length - 4;
 
@@ -143,12 +125,12 @@ export class Transactions extends React.Component {
                             onRefresh={() => (this._onRefresh.bind(this))}
                         />}>
                         <StatusBar backgroundColor="#2C2F33" barStyle="light-content" />
-                        {
-                            this.state.trans.map((m, i) => (
-                                <View key={i} style={{ alignSelf: 'stretch', alignItems: 'center', marginTop: 20 }}>
+                        
+                                <View style={{ alignSelf: 'stretch', alignItems: 'center', marginTop: 20 }}>
                                     <Text style={{ fontFamily: 'Circular' }}>Hoy</Text>
                                     <List containerStyle={{ marginBottom: 10, alignSelf: 'stretch' }}>
-
+                                    {
+                                        this.state.trans.map((m, i) => (
                                         <ListItem
                                             key={i}
                                             title={m.name}
@@ -164,9 +146,9 @@ export class Transactions extends React.Component {
                                             onPress={() => this.props.navigation.navigate('Trans', { name: m.name, data: m, onSuccess: () => this.update() })}
                                         />
 
+                                    ))}
                                     </List>
                                 </View>
-                            ))}
 
                     </ScrollView>
                     <ActionButton
@@ -312,7 +294,6 @@ export class AddTransaction extends React.Component {
 
         let amount = parseFloat(amountIn).toFixed(2);
         // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-        console.log(amount);
         let splitAmount = amount.split(".")[0];
         let i = splitAmount.length - 4;
 
@@ -1084,7 +1065,6 @@ export class TransactionDetail extends React.Component {
 
         let amount = parseFloat(amountIn).toFixed(2);
         // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-        console.log(amount);
         let splitAmount = amount.split(".")[0];
         let i = splitAmount.length - 4;
 
