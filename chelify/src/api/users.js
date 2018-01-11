@@ -1,4 +1,5 @@
 import {ToastAndroid} from 'react-native';
+import { Settings } from '../settings';
 export const users = [
     {
         name: "Anastasia Martinez",
@@ -44,8 +45,7 @@ export const users = [
     }
 ];
 
-const baseUrl = 'http://chelify.com';
-const loginApi = baseUrl + '/api/auth/login';
+const loginApi = Settings.baseUrl + '/auth/login';
 
 export function login(email, password, callback) {
     fetch(loginApi, {
