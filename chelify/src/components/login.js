@@ -5,6 +5,7 @@ import * as Animatable from 'react-native-animatable'
 import {
     View,
     Text,
+    ActivityIndicator,
     StatusBar,
     Image,
     TextInput,
@@ -14,20 +15,28 @@ import {
     ToastAndroid
 } from 'react-native'
 import {login} from '../api/users';
-
+const baseUrl = 'https://chelify-nicoavn.c9users.io/chelify_server/public';
+const loginApi = baseUrl + '/api/auth/login';
 export class Login extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             email: "",
-            password: ""
+            password: "",
+            animating: false
         };
     }
 
     static navigationOptions = {
         header: null,
     }
+    static resetAction = NavigationActions.reset({
+        index: 0,
+        actions: [
+            NavigationActions.navigate({ routeName: 'Start' })
+        ]
+    })
     async checkForPasscode() {
         try {
             let value = await AsyncStorage.getItem('passcode');
@@ -40,19 +49,54 @@ export class Login extends React.Component {
             
           }
     }
+    async saveCurrentUser(obj) {
+        try {
+            if(obj != null && obj.access_token != null) {
+                await AsyncStorage.setItem('currentUser', JSON.stringify(obj));
+                this.props.navigation.dispatch(Login.resetAction)
+                this.setState({animating: false})
+            } else {
+                ToastAndroid.show("Usuario o contraseña incorrecta", ToastAndroid.SHORT);
+                this.setState({animating: false})
+            }
+        }
+        catch (error) {
+            // Error retrieving data
+            ToastAndroid.show('lol', ToastAndroid.SHORT)
+            console.log(error);
+            
+          }
+    }
     componentDidMount() {
         this.checkForPasscode()
     }
-    loginAction = function() {
-        login(this.state.email, this.state.password)
+    logMeIn(email, password, callback) {
+        fetch(loginApi, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                this.saveCurrentUser(responseJson);
+            })
+            .catch((error) => {
+                console.log(error)
+                console.log('Lo mandé a ' + loginApi)
+    
+            });
     }
-
-    static resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-            NavigationActions.navigate({ routeName: 'Start' })
-        ]
-    })
+    loginAction () {
+        console.log('toy aqui')
+        this.setState({animating: true});
+        this.logMeIn(this.state.email, this.state.password)
+    }
 
     static goToPasscodePage = NavigationActions.reset({
         index: 0,
@@ -67,7 +111,6 @@ export class Login extends React.Component {
                     backgroundColor="#2C2F33"
                     barStyle="light-content"
                 />
-                
                 <Animatable.Image
                 animation="bounceIn"
                     style={{ width: 200, height: 100 }}
@@ -98,11 +141,11 @@ export class Login extends React.Component {
                         value={this.state.password}
                     />
                 </View>
-                <View style={styles.buttonsContainer}>
+                <View style={[styles.buttonsContainer, {marginBottom: 25}]}>
                     <Button
                         style={styles.buttons}
                         color="#24E189"
-                        onPress={() => this.props.navigation.dispatch(Login.resetAction)}
+                        onPress={() => /*this.loginAction()*/this.props.navigation.dispatch(Login.resetAction)}
                         title="Iniciar sesión"
                     />
                     <Button
@@ -112,6 +155,7 @@ export class Login extends React.Component {
                         title="Nueva cuenta"
                     />
                 </View>
+                <ActivityIndicator size="large" color="#24E189" animating={this.state.animating}/>
                 </Animatable.View>
             </View>
 

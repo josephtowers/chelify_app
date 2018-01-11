@@ -12,7 +12,7 @@ import {
     KeyboardAvoidingView
 } from 'react-native'
 
-const baseUrl = 'http://10.6.250.129:8000';
+const baseUrl = 'https://chelify-nicoavn.c9users.io/chelify_server/public/';
 const registerApi = baseUrl + '/api/register';
 
 export class Register extends React.Component {
@@ -39,11 +39,11 @@ export class Register extends React.Component {
             })
         }).then((response) => response.json())
             .then((responseJson) => {
+                console.log(responseJson)
                 ToastAndroid.show('El usuario ta jevi', ToastAndroid.SHORT);
             })
             .catch((error) => {
-                ToastAndroid.show(error.message, ToastAndroid.SHORT);
-
+                console.log(error);
             });
     }
     backAction = NavigationActions.back();
@@ -53,7 +53,12 @@ export class Register extends React.Component {
         this.state = {
             name: '',
             email: '',
-            password: ''
+            password: '',
+            nameError: false,
+            emailError: false,
+            emailConfirmationError: false,
+            passwordError: false,
+            passwordConfirmationError: false
         }
     }
     render() {
@@ -68,14 +73,19 @@ export class Register extends React.Component {
                     <TextInput
                         style={styles.inputs}
                         placeholder="Nombre"
+                        maxLength={50}
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
                         onChangeText={(name) => this.setState({ name })}
                         value={this.state.name}
                     />
+                    {
+                        this.state.nameError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Introduce tu nombre</Text>
+                    }
                     <TextInput
                         style={styles.inputs}
                         keyboardType="email-address"
+                        maxLength={100}
                         placeholder="Correo electrónico"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
@@ -83,38 +93,53 @@ export class Register extends React.Component {
                         value={this.state.email}
                         autoCapitalize="none"
                     />
+                    {
+                        this.state.emailError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Introduce un correo válido</Text>
+                    }
                     <TextInput
                         style={styles.inputs}
                         keyboardType="email-address"
+                        maxLength={100}
                         placeholder="Repetir correo electrónico"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
                         autoCapitalize="none"
                     />
+                    {
+                        this.state.emailConfirmationError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Los correos no coinciden</Text>
+                    }
                     <TextInput
                         style={styles.inputs}
                         secureTextEntry={true}
                         placeholder="Contraseña"
+                        maxLength={16}
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
                         onChangeText={(password) => this.setState({ password })}
                         value={this.state.password}
                         autoCapitalize="none"
                     />
+                    {
+                        this.state.passwordError && <Text style={{color: 'red', fontFamily: 'Circular'}}>La contraseña debe tener entre 8 y 16 caracteres</Text>
+                    }
                     <TextInput
                         style={styles.inputs}
                         secureTextEntry={true}
+                        maxLength={16}
                         placeholder="Repetir contraseña"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
                         autoCapitalize="none"
                     />
+                    {
+                        this.state.passwordConfirmationError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Las contraseñas no coinciden</Text>
+                    }
                 </View>
                 <View style={styles.buttonsContainer}>
                     <Button
                         style={styles.buttons}
                         color="#24E189"
-                        onPress={() => this.props.navigation.dispatch(this.resetAction)}
+                        onPress={() => this.userLogin()}
                         title="Crear cuenta"
                     />
                 </View>

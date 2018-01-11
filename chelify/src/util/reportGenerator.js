@@ -5,7 +5,13 @@ import {
     Alert
 } from 'react-native'
 import transactions from '../api/transactions'
-
+import {
+    VictoryChart,
+    VictoryBar,
+    VictoryLegend,
+    VictoryTheme,
+    VictoryContainer
+} from 'victory-native'
 let data = {
     title: "Mi reporte",
     type: "bar",
@@ -13,6 +19,20 @@ let data = {
     var2: "categories",
     date: "last-six-months"
 }
+let it = 
+[
+    {x: 'Comida', y: 50},
+    {x: 'Romo', y: 250},
+    {x: 'Leche', y: 500},
+    {x: 'Semilla', y: 420},
+    {x: 'Pene', y: 110},
+    {x: 'Pene', y: 110},
+    {x: 'Penee', y: 110},
+    {x: 'Peneee', y: 110},
+    {x: 'Peneeee', y: 110},
+    {x: 'Peneeeee', y: 110},
+    {x: 'Ropa', y: 100}
+]
 export const generate = (text) => {
     let dataset = data;
     let sortBy = []
@@ -38,7 +58,18 @@ export const generate = (text) => {
         break;
     }
     return (
-        <View><Text>{sortBy.toString()}</Text></View>
+        <VictoryChart
+        theme={VictoryTheme.material}
+  domainPadding={20}
+  containerComponent={<VictoryContainer
+/>}>
+  
+        <VictoryBar 
+        data={it}
+        alignment={'middle'}
+        animate={true}
+        horizontal={true} />
+        </VictoryChart>
     )
 }
 export default generate;

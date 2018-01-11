@@ -45,9 +45,9 @@ export const users = [
 ];
 
 const baseUrl = 'http://chelify.com';
-const loginApi = baseUrl + '/auth/login';
+const loginApi = baseUrl + '/api/auth/login';
 
-export function login(email, password) {
+export function login(email, password, callback) {
     fetch(loginApi, {
         method: 'POST',
         headers: {
@@ -60,11 +60,11 @@ export function login(email, password) {
         })
     }).then((response) => response.json())
         .then((responseJson) => {
-            ToastAndroid.show('El usuario ta jevi', ToastAndroid.SHORT);
             console.log(responseJson);
+            callback();
         })
         .catch((error) => {
-            ToastAndroid.show(error.message, ToastAndroid.SHORT);
+            console.log(error)
 
         });
 }

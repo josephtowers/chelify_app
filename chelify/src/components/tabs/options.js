@@ -771,6 +771,30 @@ export class AddPayment extends Component {
                 parallaxHeight={500}
                 renderParallaxForeground={() => (
                     <View style={{ height: 500, zIndex: 0, alignItems: 'center', justifyContent: 'center', zIndex: -100 }}>
+                    <Modal
+                                    animationType="slide"
+                                    visible={this.state.bankModalVisible}
+                                    onRequestClose={() => { this.setBankModalVisible(!this.state.bankModalVisible) }}>
+                                    <ScrollView flex={1}>
+                                        <SearchBar
+                                            inputStyle={{ fontFamily: 'Circular' }}
+                                            placeholder='Buscar banco'
+                                            onChangeText={(text) => this.searchBank(text)} />
+                                        <List>
+                                            {
+                                                this.state.bankSearchResult.map((l, i) => (
+                                                    <ListItem
+                                                        fontFamily={'Circular'}
+                                                        title={l}
+                                                        hideChevron={true}
+                                                        onPress={() => this.changeBank(l)}
+                                                        key={i}
+                                                    />
+                                                ))
+                                            }
+                                        </List>
+                                    </ScrollView>
+                                </Modal>
                         <Text style={{ color: 'white', fontFamily: 'Circular', marginBottom: 3 }}>Balance de la {this.state.cardBottomWidth != 0 ? 'tarjeta' : 'cuenta'}:</Text>
                         <Text style={{ fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10 }}>RD${this.state.formattedAmount}</Text>
                         <View>
@@ -866,30 +890,7 @@ export class AddPayment extends Component {
                     {
                         this.state.bankBottomWidth != 0 && (
                             <View>
-                                <Modal
-                                    animationType="slide"
-                                    visible={this.state.bankModalVisible}
-                                    onRequestClose={() => { this.setBankModalVisible(!this.state.bankModalVisible) }}>
-                                    <ScrollView flex={1}>
-                                        <SearchBar
-                                            inputStyle={{ fontFamily: 'Circular' }}
-                                            placeholder='Buscar banco'
-                                            onChangeText={(text) => this.searchBank(text)} />
-                                        <List>
-                                            {
-                                                this.state.bankSearchResult.map((l, i) => (
-                                                    <ListItem
-                                                        fontFamily={'Circular'}
-                                                        title={l}
-                                                        hideChevron={true}
-                                                        onPress={() => this.changeBank(l)}
-                                                        key={i}
-                                                    />
-                                                ))
-                                            }
-                                        </List>
-                                    </ScrollView>
-                                </Modal>
+                                
                                 <Modal
                                     animationType="fade"
                                     transparent={true}

@@ -49,6 +49,10 @@ export const styles = StyleSheet.create({
             color: '#FFFFFF',
             marginBottom: 5,
         },
+        chart: {
+            width: 200,
+            height: 200,
+        },
         inputs: {
             alignSelf: 'stretch',
             color: '#FFFFFF',
@@ -152,8 +156,9 @@ export const styles = StyleSheet.create({
             borderColor: 'white'
         },
         chart: {
-            width: 360,
-            height: 200
+            width: Dimensions.get('window').width - 30,
+            height: 200,
+            marginBottom: 20
         },
         chartContainer: {
             flex: 1,

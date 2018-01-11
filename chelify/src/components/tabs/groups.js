@@ -578,13 +578,6 @@ export class AddGroup extends React.Component {
                         value={this.state.name}
                         onChangeText={(text) => this.setState({ name: text })}
                     />
-                    <TextInput
-                        placeholder="Descripción"
-                        placeholderTextColor="#787878"
-                        underlineColorAndroid="#787878"
-                        value={this.state.description}
-                        onChangeText={(text) => this.setState({ description: text })}
-                    />
                     <View style={{ flexDirection: 'row' }}>
                         <View style={{ flex: 7 }}>
                             <TextInput

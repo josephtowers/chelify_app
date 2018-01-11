@@ -11,15 +11,17 @@ import {
     Modal,
     TextInput,
     AsyncStorage,
+    ActivityIndicator,
     Button
 } from 'react-native'
 import {
     List,
     ListItem
 } from 'react-native-elements'
+import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../../styles/style.js'
-var ImagePicker = require('react-native-image-picker');
+//var ImagePicker = require('react-native-image-picker');
 import users from '../../api/users.js'
 import {
     VictoryChart,
@@ -27,7 +29,7 @@ import {
     VictoryTheme,
     VictoryContainer
 } from 'victory-native'
-
+import Chart from 'react-native-chart';
 const assets = [
     {
         name: "Efectivo",
@@ -66,14 +68,24 @@ const capital = [
     }
 
 ]
-
+const data = [
+	["01/01", 300],
+	["01/02", 100],
+	["01/03", 50],
+	["01/04", 420],
+	["01/05", 100],
+	["01/06", 100],
+	["01/07", 150]
+];
 export class Overview extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             avatarSource: { uri: 'https://randomuser.me/api/portraits/men/36.jpg' },
             passcodeModalVisible: false,
-            passcode: ''
+            passcode: '',
+            user: null,
+            loading: true
         }
     }
     async checkForPasscode() {
@@ -102,6 +114,22 @@ export class Overview extends React.Component {
             
           }
     }
+    async getUser() {
+        try {
+            let user = await AsyncStorage.getItem('currentUser');
+            let value = JSON.parse(user);
+            if (value !== null){
+              this.setState({user: value, loading: false})
+            }
+          } catch (error) {
+            // Error retrieving data
+            console.log('2value');
+            
+          }
+    }
+    componentWillMount() {
+        this.getUser();
+    }
     componentDidMount() {
         console.log('here')
         this.checkForPasscode()
@@ -123,7 +151,7 @@ export class Overview extends React.Component {
         }
     };
 
-    selectImage() {
+    selectImage() {/*
         ImagePicker.showImagePicker(this.options, (response) => {
             console.log('Response = ', response);
 
@@ -138,7 +166,6 @@ export class Overview extends React.Component {
             }
             else {
                 let source = { uri: response.uri };
-
                 // You can also display the image using data:
                 // let source = { uri: 'data:image/jpeg;base64,' + response.data };
 
@@ -148,7 +175,24 @@ export class Overview extends React.Component {
                     users[1].image = source;
                 });
             }
-        });
+        });*/
+        ImagePicker.openPicker({
+            width: 300,
+            height: 300,
+            cropping: true,
+            cropperToolbarTitle: 'Editar foto'
+          }).then(image => {
+            console.log(image);
+            let source = { uri: image.path };
+                // You can also display the image using data:
+                // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                this.setState({
+                    avatarSource: source
+                }, function () {
+                    users[1].image = source;
+                });
+          }).catch(e => console.log(e));
     }
     setPasscodeModalVisible(visible) {
         this.setState({ passcodeModalVisible: visible });
@@ -159,7 +203,9 @@ export class Overview extends React.Component {
     }
     render() {
         return (
-            <ScrollView contentContainerStyle={{ alignItems: 'center', alignSelf: 'stretch', backgroundColor: '#FFF' }}>
+            
+                !this.state.loading ? (
+                    <ScrollView contentContainerStyle={{ alignItems: 'center', alignSelf: 'stretch', backgroundColor: '#FFF' }}>
             
             <Modal
             animationType="fade"
@@ -180,6 +226,8 @@ export class Overview extends React.Component {
                 style={{ fontFamily: 'Circular' }}
                 placeholderTextColor="#787878"
                 secureTextEntry={true}
+                keyboardType={"numeric"}
+                maxLength={4}
                 underlineColorAndroid="#787878"
                 value={this.state.passcode}
                 onChangeText={(text) => this.setState({passcode: text})} />
@@ -207,33 +255,21 @@ export class Overview extends React.Component {
 
                         />
                     </TouchableNativeFeedback>
-                    <Text style={[{ color: '#000', fontSize: 20 }, styles.font]}>Roberto Mercedes</Text>
+                    <Text style={[{ color: '#000', fontSize: 20 }, styles.font]}>{this.state.user.name}</Text>
                     <View>
-                        <View style={{ alignSelf: 'stretch', alignItems: 'flex-start' }}>
-                            <Text style={{ marginLeft: 20, fontSize: 18, fontFamily: 'Circular' }}>Resumen del mes de Diciembre</Text>
+                        <View style={{ alignSelf: 'stretch', alignItems: 'center', marginBottom: 15 }}>
+                            <Text style={{fontSize: 18, fontFamily: 'Circular' }}>Resumen de gastos de la semana</Text>
                         </View>
                     </View>
-                    <VictoryChart
-                        theme={VictoryTheme.material}
-                        containerComponent={<VictoryContainer
-                            onTouchStart={() => this.setState({ scrollEnabled: true })}
-                            onTouchEnd={() => this.setState({ scrollEnabled: true })}
-                        />}
-                    >
-                        <VictoryLine
-                            style={{
-                                data: { stroke: "#c43a31" },
-                                parent: { border: "1px solid #ccc" }
-                            }}
-                            data={[
-                                { x: 1, y: 2 },
-                                { x: 2, y: 3 },
-                                { x: 3, y: 5 },
-                                { x: 4, y: 4 },
-                                { x: 5, y: 7 }
-                            ]}
-                        />
-                    </VictoryChart>
+                    <View style={styles.chartContainer}>
+                    <Chart
+					style={styles.chart}
+					data={data}
+                    type="line"
+                    showGrid={false}
+                    showDataPoint={false}
+                    color={'#24E189'}                   
+				 /></View>
                     <View style={{ alignSelf: 'stretch', alignItems: 'flex-start' }}>
                         <Text style={{ marginLeft: 20, fontSize: 18, fontFamily: 'Circular' }}>Activos</Text>
                     </View>
@@ -287,6 +323,11 @@ export class Overview extends React.Component {
                     </List>
                 </View>
             </ScrollView>
+                ) : (
+                    <View style={styles.container}>
+                    <ActivityIndicator size="large" color="#24E189" animating={this.state.loading}/>
+                    </View>
+                )            
         );
     }
 }
