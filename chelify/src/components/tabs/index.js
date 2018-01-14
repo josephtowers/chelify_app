@@ -31,6 +31,7 @@ export const TabView = TabNavigator({
         tabBarPosition: 'bottom',
         swipeEnabled: false,
         animationEnabled: false,
+        lazy: true,
         tabBarOptions: {
             style:
                 {

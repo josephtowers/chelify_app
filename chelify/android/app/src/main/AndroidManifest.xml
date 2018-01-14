@@ -33,7 +33,7 @@
       android:name="com.google.android.geo.API_KEY"
       android:value="AIzaSyDrTGuF8dVZziGToj9Q3cBv1k_CKivDTn4"/>
       <meta-data android:name="com.bugsnag.android.API_KEY"
-             android:value="c73f13e3694f4894f3804ff7dbeaf29f"/>
+             android:value="a5cecc3a75ace93eedae0a1b8d612eb8"/>
     <meta-data android:name="com.samsung.android.icon_container.has_icon_container" android:value="true"/>
 
     </application>

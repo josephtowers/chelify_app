@@ -109,7 +109,7 @@ export class Options extends React.Component {
     }
     async deleteUserData() {
         try {
-            await AsyncStorage.removeItem('passcode');
+            await AsyncStorage.clear();
             this.props.screenProps.rootNavigation.dispatch(Options.resetAction)
             
           } catch (error) {

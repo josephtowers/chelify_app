@@ -8,6 +8,7 @@ import {
     RefreshControl,
     CheckBox,
     StatusBar,
+    AsyncStorage,
     ScrollView,
     ToastAndroid,
     Alert,
@@ -42,6 +43,53 @@ import { connect } from 'react-redux'
 import ParallaxScroll from '@monterosa/react-native-parallax-scroll';
 import transactions from '../../api/transactions'
 import payments from '../../api/payments'
+import categoryIcons from '../../util/icons'
+
+let formatDate = (date, time) => {
+    let year = new Date().getFullYear()
+    let day = new Date().getDate()
+    let month = new Date().getMonth()
+    let finalDate = ""
+    let months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo',
+        'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    let dateParts = date.split(/[- :]/)
+    if (dateParts[2][0] == '0') dateParts[2] = dateParts[2].substring(1, 2)
+    if (day.toString() == dateParts[2] && (month + 1) == parseInt(dateParts[1]) && year == parseInt(dateParts[0])) {
+        finalDate = "Hoy"
+    }
+    else finalDate = dateParts[2] + " de " + months[dateParts[1] - 1].toLowerCase()
+    year.toString() != dateParts[0] && (finalDate += " del " + dateParts[0])
+    time && (finalDate += " a las " + dateParts[3] + ":" + dateParts[4])
+    return finalDate
+
+}
+
+let groupTransactionsByDate = (arr) => {
+    let res = []
+    let dates = []
+    for (let trans of arr) {
+        let d = formatDate(trans.created_at)
+        if (dates.indexOf(d) == -1) {
+            dates.push(d)
+        }
+    }
+    for (let ds of dates) {
+        let ts = []
+        for (let trans of arr) {
+            let d = formatDate(trans.created_at)
+            if (ds == d) {
+                ts.push(trans)
+            }
+        }
+        let newGroup = {
+            date: ds,
+            transactions: ts
+        }
+        res.push(newGroup)
+    }
+    console.log(res);
+    return res
+}
 
 const categories = [
     {
@@ -68,6 +116,11 @@ export class Transactions extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            trans: transactions,
+            loading: true,
+            user: null
+        }
     }
     static navigationOptions = {
         title: 'Transacciones',
@@ -77,21 +130,61 @@ export class Transactions extends React.Component {
             <Icon name="credit-card" size={15} color="#FFF" />
         ),
     }
+    async getUser() {
+        try {
+            if (this.state.user == null) {
 
-    getInitialState() {
-        // This assumes your external thing is written by someone who was
-        // smart enough to not allow direct manipulation, but made sure
-        // to use API functions that allow for event handling etc.
-        return { trans: transactions, refreshing: false }
+
+                let user = await AsyncStorage.getItem('currentUser');
+                let value = JSON.parse(user);
+                console.log(value);
+                if (value !== null) {
+                    this.setState({ user: value.user }, () => {
+
+                        this.getTransactions();
+                    })
+                }
+            }
+        } catch (error) {
+            console.log('2value');
+
+        }
     }
-    state = {
-        trans: transactions,
-        refreshing: false
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps)
+    }
+    getTransactions() {
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/by-account/" + this.state.user.account_id, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                this.setState({ trans: responseJson.transactions, loading: false, refreshing: false })
+            })
+            .catch((error) => {
+                ToastAndroid.show('2', 3)
+                console.log(error)
+
+            });
+    }
+    getIcon(name) {
+        for (let obj of categoryIcons) {
+            if (obj.name == name) {
+                return obj.source
+            }
+        }
+        return null
+
+    }
+    componentWillMount() {
+        this.getUser();
     }
     _onRefresh() {
-        this.setState({ refreshing: true });
-        this.setState({ trans: transactions });
-        this.setState({ refreshing: false });
+        this.setState({ refreshing: true }, () => this.getTransactions());
     }
 
     update() {
@@ -115,65 +208,77 @@ export class Transactions extends React.Component {
     render() {
 
         return (
+            !this.state.loading ? (
+                this.state.trans.length > 0 ? (
+                    <View style={{ flex: 1 }}>
+                        <ScrollView
+                            refreshControl={<RefreshControl
+                                enabled={true}
+                                refreshing={this.state.refreshing}
+                                onRefresh={() => (this._onRefresh())}
+                            />}>
+                            <StatusBar backgroundColor="#2C2F33" barStyle="light-content" />
 
-            this.state.trans.length > 0 ? (
-                <View style={{ flex: 1 }}>
-                    <ScrollView
-                        refreshControl={<RefreshControl
-                            enabled={true}
-                            refreshing={this.state.refreshing}
-                            onRefresh={() => (this._onRefresh.bind(this))}
-                        />}>
-                        <StatusBar backgroundColor="#2C2F33" barStyle="light-content" />
-                        
-                                <View style={{ alignSelf: 'stretch', alignItems: 'center', marginTop: 20 }}>
-                                    <Text style={{ fontFamily: 'Circular' }}>Hoy</Text>
-                                    <List containerStyle={{ marginBottom: 10, alignSelf: 'stretch' }}>
-                                    {
-                                        this.state.trans.map((m, i) => (
-                                        <ListItem
-                                            key={i}
-                                            title={m.name}
-                                            hideChevron={true}
-                                            avatar={m.category}
-                                            avatarStyle={{ backgroundColor: 'white' }}
-                                            subtitle={m.account}
-                                            subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
-                                            rightTitleNumberOfLines={2}
-                                            fontFamily="Circular"
-                                            rightTitle={"RD$" + this.cashify(m.amount)}
-                                            rightTitleStyle={{ fontFamily: 'Circular', textAlign: 'right' }}
-                                            onPress={() => this.props.navigation.navigate('Trans', { name: m.name, data: m, onSuccess: () => this.update() })}
-                                        />
+                            <View style={{ alignSelf: 'stretch', alignItems: 'center', marginTop: 20 }}>
+                                {
+                                    groupTransactionsByDate(this.state.trans).map((j, l) => (
+                                        <View key={l} style={{ alignSelf: 'stretch', alignItems: 'center' }}>
+                                            <Text style={{ fontFamily: 'Circular' }}>{j.date}</Text>
+                                            <List containerStyle={{ marginBottom: 10, alignSelf: 'stretch' }}>
+                                                {
+                                                    j.transactions.map((m, i) => (
+                                                        <ListItem
+                                                            key={i}
+                                                            title={m.title}
+                                                            hideChevron={true}
+                                                            avatarStyle={{ backgroundColor: 'white' }}
+                                                            avatar={this.getIcon(m.category.icon)}
+                                                            subtitle={m.category.name}
+                                                            subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
+                                                            rightTitleNumberOfLines={2}
+                                                            fontFamily="Circular"
+                                                            rightTitle={"RD$" + this.cashify(m.amount)}
+                                                            rightTitleStyle={{ fontFamily: 'Circular', textAlign: 'right' }}
+                                                            onPress={() => this.props.navigation.navigate('Trans', { name: m.name, data: m, onSuccess: () => this.update() })}
+                                                        />
 
-                                    ))}
-                                    </List>
-                                </View>
+                                                    ))}
+                                            </List>
+                                        </View>
+                                    ))
+                                }
 
-                    </ScrollView>
-                    <ActionButton
-                        buttonColor="#24E189"
-                        onPress={() => this.props.navigation.navigate('Add', { onSuccess: () => this.update() })}
-                    />
-                </View>
-            ) : (
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', paddingHorizontal: 15 }}>
-                            <TouchableNativeFeedback
-                            >
-                                <Image
-                                    style={{ width: 128, height: 128 }}
-                                    source={require('../../../assets/img/receipt.png')}
-                                />
-                            </TouchableNativeFeedback>
-                            <Text style={{ fontFamily: 'Circular', fontSize: 20, textAlign: 'center', marginTop: 10 }}>No tienes transacciones. ¡Utiliza el botón para crear una!</Text>
-                        </View>
+                            </View>
+
+                        </ScrollView>
                         <ActionButton
                             buttonColor="#24E189"
                             onPress={() => this.props.navigation.navigate('Add', { onSuccess: () => this.update() })}
                         />
                     </View>
-                ));
+                ) : (
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', paddingHorizontal: 15 }}>
+                                <TouchableNativeFeedback
+                                >
+                                    <Image
+                                        style={{ width: 128, height: 128 }}
+                                        source={require('../../../assets/img/receipt.png')}
+                                    />
+                                </TouchableNativeFeedback>
+                                <Text style={{ fontFamily: 'Circular', fontSize: 20, textAlign: 'center', marginTop: 10 }}>No tienes transacciones. ¡Utiliza el botón para crear una!</Text>
+                            </View>
+                            <ActionButton
+                                buttonColor="#24E189"
+                                onPress={() => this.props.navigation.navigate('Add', { onSuccess: () => this.update() })}
+                            />
+                        </View>
+                    )
+            ) : (
+                    <View style={styles.container}>
+                        <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
+                    </View>
+                ))
     }
 }
 
@@ -184,6 +289,7 @@ export class AddTransaction extends React.Component {
         super(props);
         this.state = {
             language: "",
+            loading: true,
             inputValue: 10,
             modalVisible: false,
             paymentModalVisible: false,
@@ -191,9 +297,12 @@ export class AddTransaction extends React.Component {
             id: 0,
             name: "",
             description: "",
+            user: null,
             payment: null,
             paymentName: "",
             amount: 0,
+            categories: null,
+            payments: null,
             category: null,
             categoryName: "",
             date: 'Hoy a las 11:09PM',
@@ -255,7 +364,7 @@ export class AddTransaction extends React.Component {
     }
     searchPayment(query) {
         let result = [];
-        for (let val of payments) {
+        for (let val of this.state.payments) {
             let searchIn = removeDiacritics(val.name.toLowerCase());
             let term = removeDiacritics(query.toLowerCase())
             if (searchIn.search(term) >= 0) {
@@ -266,7 +375,7 @@ export class AddTransaction extends React.Component {
     }
     searchCategory(query) {
         let result = [];
-        for (let val of categories) {
+        for (let val of this.state.categories) {
             let searchIn = removeDiacritics(val.name.toLowerCase());
             let term = removeDiacritics(query.toLowerCase())
             if (searchIn.search(term) >= 0) {
@@ -305,14 +414,14 @@ export class AddTransaction extends React.Component {
 
     }
     changeCategory(obj) {
-        this.setState({ category: obj.avatar, categoryName: obj.name })
+        this.setState({ category: obj })
         this.setModalVisible(!this.state.modalVisible)
-        this.setState({ searchResult: categories })
+        this.setState({ searchResult: this.state.categories })
     }
     changePayment(obj) {
-        this.setState({ payment: obj.avatar, paymentName: obj.name })
+        this.setState({ payment: obj })
         this.setPaymentModalVisible(!this.state.paymentModalVisible)
-        this.setState({ paymentSearchResult: payments })
+        this.setState({ paymentSearchResult: this.state.payments })
     }
     changeLocation(obj) {
         this.setState({ location: obj })
@@ -335,204 +444,274 @@ export class AddTransaction extends React.Component {
     }
     pushTransaction() {
         let newTransaction = {
-            dayId: 0,
-            id: 5,
-            name: this.state.name,
-            account: this.state.paymentName,
+            google_place_id: this.state.location.place_id,
+            title: this.state.name,
             amount: this.state.amount,
-            category: this.state.category,
-            categoryName: this.state.categoryName,
-            description: this.state.description,
-            date: 'Ahora'
+            financial_instrument_id: this.state.payment.id,
+            transaction_category_id: this.state.category.id
         }
-        transactions.push(newTransaction);
-        this.props.navigation.state.params.onSuccess();
-        this.props.navigation.dispatch(this.backAction);
-        ToastAndroid.show('La transacción se ha agregado', ToastAndroid.SHORT)
-    }
 
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newTransaction)
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson)
+                this.props.navigation.state.params.onSuccess();
+                this.props.navigation.dispatch(this.backAction);
+                ToastAndroid.show('La transacción se ha agregado', ToastAndroid.SHORT)
+            })
+            .catch((error) => {
+                ToastAndroid.show(error.message, ToastAndroid.SHORT);
+
+            });
+
+    }
+    async getUser() {
+        try {
+            if (this.state.user == null) {
+                let user = await AsyncStorage.getItem('currentUser');
+                let value = JSON.parse(user);
+                console.log(value);
+                if (value !== null) {
+                    this.setState({ user: value.user }, () =>
+                        this.getCategories())
+                }
+            }
+        } catch (error) {
+            console.log('2value');
+
+        }
+    }
+    getInstruments() {
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/financial-instrument/by-account/" + this.state.user.account_id, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                this.setState({
+                    paymentSearchResult: responseJson.financial_instruments,
+                    payments: responseJson.financial_instruments,
+                    loading: false
+                })
+            })
+            .catch((error) => {
+                console.log(error);
+                ToastAndroid.show('Eso no e así viejooo...', 5);
+
+            });
+    }
+    getCategories() {
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction-category", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                this.setState({
+                    searchResult: responseJson.transaction_categories,
+                    categories: responseJson.transaction_categories
+                }, () =>
+                        this.getInstruments())
+            })
+            .catch((error) => {
+                console.log(error);
+                ToastAndroid.show('Eso no e así viejoo...', 5);
+
+            });
+    }
+    getIcon(name) {
+        for (let obj of categoryIcons) {
+            if (obj.name == name) {
+                return obj.source
+            }
+        }
+        return null
+
+    }
+    componentWillMount() {
+        this.setState({ loading: true }, () => this.getUser())
+    }
     render() {
         return (
-            <ParallaxScroll
-                style={{ backgroundColor: '#2C2F33' }}
-                parallaxHeight={500}
-                renderParallaxForeground={() => (
-                    <View style={{ height: 500, zIndex: 0, alignItems: 'center', justifyContent: 'center', zIndex: -100 }}>
-                        <Text style={{ color: 'white', fontFamily: 'Circular', marginBottom: 3 }}>Monto de la transacción:</Text>
-                        <Text style={{ fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10 }}>RD${this.state.formattedAmount}</Text>
-                        <View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => this.changeAmount(1)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>1</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(2)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>2</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(3)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>3</Text></View>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => this.changeAmount(4)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>4</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(5)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>5</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(6)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>6</Text></View>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => this.changeAmount(7)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>7</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(8)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>8</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(9)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>9</Text></View>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity>
-                                    <View style={styles.circleBlank}></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(0)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>0</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(10)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>{"x"}</Text></View>
-                                </TouchableOpacity>
+            !this.state.loading ? (
+                <ParallaxScroll
+                    style={{ backgroundColor: '#2C2F33' }}
+                    parallaxHeight={500}
+                    renderParallaxForeground={() => (
+                        <View style={{ height: 500, zIndex: 0, alignItems: 'center', justifyContent: 'center', zIndex: -100 }}>
+                            <Text style={{ color: 'white', fontFamily: 'Circular', marginBottom: 3 }}>Monto de la transacción:</Text>
+                            <Text style={{ fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10 }}>RD${this.state.formattedAmount}</Text>
+                            <View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(1)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>1</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(2)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>2</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(3)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>3</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(4)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>4</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(5)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>5</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(6)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>6</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(7)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>7</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(8)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>8</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(9)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>9</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity>
+                                        <View style={styles.circleBlank}></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(0)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>0</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(10)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>{"x"}</Text></View>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                )}>
-                <View style={{ backgroundColor: 'white', borderRadius: 10, marginHorizontal: 10, zIndex: 100, height: (Dimensions.get('window').height - 85) }}>
-                    <Modal
-                        animationType="slide"
-                        visible={this.state.modalVisible}
-                        onRequestClose={() => { this.setModalVisible(!this.state.modalVisible) }}>
-                        <View flex={1}>
-                            <SearchBar
-                                inputStyle={{ fontFamily: 'Circular' }}
-                                placeholder='Buscar categoría'
-                                onChangeText={(text) => this.searchCategory(text)} />
-                            <List>
+                    )}>
+                    <View style={{ backgroundColor: 'white', borderRadius: 10, marginHorizontal: 10, zIndex: 100, height: (Dimensions.get('window').height - 85) }}>
+                        <Modal
+                            animationType="slide"
+                            visible={this.state.modalVisible}
+                            onRequestClose={() => { this.setModalVisible(!this.state.modalVisible) }}>
+                            <ScrollView flex={1}>
+                                <SearchBar
+                                    inputStyle={{ fontFamily: 'Circular' }}
+                                    placeholder='Buscar categoría'
+                                    onChangeText={(text) => this.searchCategory(text)} />
+                                <List>
+                                    {
+                                        this.state.searchResult.map((l, i) => (
+                                            <ListItem
+                                                avatar={this.getIcon(l.icon)}
+                                                avatarStyle={{ backgroundColor: 'white' }}
+                                                fontFamily={'Circular'}
+                                                title={l.name}
+                                                hideChevron={true}
+                                                onPress={() => this.changeCategory(l)}
+                                                key={i}
+                                            />
+                                        ))
+                                    }
+                                </List>
+                            </ScrollView>
+                        </Modal>
+                        <Modal
+                            animationType="slide"
+                            visible={this.state.paymentModalVisible}
+                            onRequestClose={() => { this.setPaymentModalVisible(!this.state.paymentModalVisible) }}>
+                            <ScrollView flex={1}>
+                                <SearchBar
+                                    inputStyle={{ fontFamily: 'Circular' }}
+                                    placeholder='Buscar método de pago'
+                                    onChangeText={(text) => this.searchPayment(text)} />
+                                <List>
+                                    {
+                                        this.state.paymentSearchResult.map((l, i) => (
+                                            <ListItem
+                                                avatarStyle={{ backgroundColor: 'white' }}
+                                                fontFamily={'Circular'}
+                                                title={l.identifier}
+                                                hideChevron={true}
+                                                onPress={() => this.changePayment(l)}
+                                                key={i}
+                                            />
+                                        ))
+                                    }
+                                </List>
+                            </ScrollView>
+                        </Modal>
+                        <Modal
+                            animationType="slide"
+                            visible={this.state.locationModalVisible}
+                            onRequestClose={() => { this.setLocationModalVisible(!this.state.locationModalVisible) }}>
+                            <ScrollView flex={1}>
+                                <SearchBar
+                                    inputStyle={{ fontFamily: 'Circular' }}
+                                    placeholder='Agregar ubicación'
+                                    onChangeText={(text) => this.searchLocation(text)} />
                                 {
-                                    this.state.searchResult.map((l, i) => (
-                                        <ListItem
-                                            avatar={l.avatar}
-                                            avatarStyle={{ backgroundColor: 'white' }}
-                                            fontFamily={'Circular'}
-                                            title={l.name}
-                                            hideChevron={true}
-                                            onPress={() => this.changeCategory(l)}
-                                            key={i}
-                                        />
-                                    ))
+                                    this.state.isLocationLoading ? <ActivityIndicator style={{ marginTop: 30 }} size="large" color="#24E189" /> : (
+                                        <List>
+                                            {
+                                                this.state.places.map((l, i) => (
+                                                    <ListItem
+                                                        fontFamily={'Circular'}
+                                                        title={l.name}
+                                                        subtitle={l.formatted_address}
+                                                        subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
+                                                        hideChevron={true}
+                                                        onPress={() => this.changeLocation(l)}
+                                                        key={i}
+                                                    />
+                                                ))
+                                            }
+                                        </List>
+                                    )
                                 }
-                            </List>
-                        </View>
-                    </Modal>
-                    <Modal
-                        animationType="slide"
-                        visible={this.state.paymentModalVisible}
-                        onRequestClose={() => { this.setPaymentModalVisible(!this.state.paymentModalVisible) }}>
-                        <View flex={1}>
-                            <SearchBar
-                                inputStyle={{ fontFamily: 'Circular' }}
-                                placeholder='Buscar método de pago'
-                                onChangeText={(text) => this.searchPayment(text)} />
-                            <List>
-                                {
-                                    this.state.paymentSearchResult.map((l, i) => (
-                                        <ListItem
-                                            avatar={l.avatar}
-                                            avatarStyle={{ backgroundColor: 'white' }}
-                                            fontFamily={'Circular'}
-                                            title={l.name}
-                                            hideChevron={true}
-                                            onPress={() => this.changePayment(l)}
-                                            key={i}
-                                        />
-                                    ))
-                                }
-                            </List>
-                        </View>
-                    </Modal>
-                    <Modal
-                        animationType="slide"
-                        visible={this.state.locationModalVisible}
-                        onRequestClose={() => { this.setLocationModalVisible(!this.state.locationModalVisible) }}>
-                        <ScrollView flex={1}>
-                            <SearchBar
-                                inputStyle={{ fontFamily: 'Circular' }}
-                                placeholder='Agregar ubicación'
-                                onChangeText={(text) => this.searchLocation(text)} />
+
+                            </ScrollView>
+                        </Modal>
+
+                        <List style={{ marginVertical: 5 }}>
                             {
-                                this.state.isLocationLoading ? <ActivityIndicator style={{ marginTop: 30 }} size="large" color="#24E189" /> : (
-                                    <List>
-                                        {
-                                            this.state.places.map((l, i) => (
-                                                <ListItem
-                                                    fontFamily={'Circular'}
-                                                    title={l.name}
-                                                    subtitle={l.formatted_address}
-                                                    subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
-                                                    hideChevron={true}
-                                                    onPress={() => this.changeLocation(l)}
-                                                    key={i}
-                                                />
-                                            ))
-                                        }
-                                    </List>
-                                )
-                            }
-
-                        </ScrollView>
-                    </Modal>
-
-                    <List style={{ marginVertical: 5 }}>
-                        {
-                            this.state.category != null ? (
-                                <ListItem
-                                    title={this.state.categoryName}
-                                    onPress={() => { this.setModalVisible(true) }}
-                                    hideChevron={true}
-                                    fontFamily={'Circular'}
-                                    leftIcon={<Image
-                                        style={{ width: 24, height: 24, marginRight: 6 }}
-                                        source={this.state.category}
-                                    />}
-                                />
-                            ) : (
+                                this.state.category != null ? (
                                     <ListItem
-                                        title={'Seleccionar categoría'}
+                                        title={this.state.category.name}
                                         onPress={() => { this.setModalVisible(true) }}
                                         hideChevron={true}
                                         fontFamily={'Circular'}
                                         leftIcon={<Image
                                             style={{ width: 24, height: 24, marginRight: 6 }}
-                                            source={require('../../../assets/img/icons/category.png')}
+                                            source={this.getIcon(this.state.category.icon)}
                                         />}
                                     />
-                                )}
-                        {
-                            this.state.payment != null ? (
-                                <ListItem
-                                    title={this.state.paymentName}
-                                    onPress={() => { this.setPaymentModalVisible(true) }}
-                                    hideChevron={true}
-                                    fontFamily={'Circular'}
-                                    leftIcon={<Image
-                                        style={{ width: 24, height: 24, marginRight: 6 }}
-                                        source={this.state.payment}
-                                    />}
-                                />
-                            ) : (
+                                ) : (
+                                        <ListItem
+                                            title={'Seleccionar categoría'}
+                                            onPress={() => { this.setModalVisible(true) }}
+                                            hideChevron={true}
+                                            fontFamily={'Circular'}
+                                            leftIcon={<Image
+                                                style={{ width: 24, height: 24, marginRight: 6 }}
+                                                source={require('../../../assets/img/icons/category.png')}
+                                            />}
+                                        />
+                                    )}
+                            {
+                                this.state.payment != null ? (
                                     <ListItem
-                                        title={'¿Cómo pagaste?'}
+                                        title={this.state.payment.identifier}
                                         onPress={() => { this.setPaymentModalVisible(true) }}
                                         hideChevron={true}
                                         fontFamily={'Circular'}
@@ -541,60 +720,75 @@ export class AddTransaction extends React.Component {
                                             source={require('../../../assets/img/icons/point-of-service.png')}
                                         />}
                                     />
-                                )
-                        }
-                        {
-                            this.state.location != null ? (
-                                <ListItem
-                                    title={this.state.location.name}
-                                    onPress={() => { this.setLocationModalVisible(true) }}
-                                    hideChevron={true}
-                                    fontFamily={'Circular'}
-                                    leftIcon={<Image
-                                        style={{ width: 24, height: 24, marginRight: 6 }}
-                                        source={require('../../../assets/img/icons/placeholder.png')}
-                                    />}
-                                />
-                            ) : (
+                                ) : (
+                                        <ListItem
+                                            title={'¿Cómo pagaste?'}
+                                            onPress={() => { this.setPaymentModalVisible(true) }}
+                                            hideChevron={true}
+                                            fontFamily={'Circular'}
+                                            leftIcon={<Image
+                                                style={{ width: 24, height: 24, marginRight: 6 }}
+                                                source={require('../../../assets/img/icons/point-of-service.png')}
+                                            />}
+                                        />
+                                    )
+                            }
+                            {
+                                this.state.location != null ? (
                                     <ListItem
-                                        title={'Agregar ubicación'}
+                                        title={this.state.location.name}
                                         onPress={() => { this.setLocationModalVisible(true) }}
                                         hideChevron={true}
                                         fontFamily={'Circular'}
                                         leftIcon={<Image
                                             style={{ width: 24, height: 24, marginRight: 6 }}
-                                            source={require('../../../assets/img/icons/map.png')}
+                                            source={require('../../../assets/img/icons/placeholder.png')}
                                         />}
                                     />
-                                )
-                        }
+                                ) : (
+                                        <ListItem
+                                            title={'Agregar ubicación'}
+                                            onPress={() => { this.setLocationModalVisible(true) }}
+                                            hideChevron={true}
+                                            fontFamily={'Circular'}
+                                            leftIcon={<Image
+                                                style={{ width: 24, height: 24, marginRight: 6 }}
+                                                source={require('../../../assets/img/icons/map.png')}
+                                            />}
+                                        />
+                                    )
+                            }
 
 
-                    </List>
-                    <TextInput
-                        placeholder="Nombre"
-                        placeholderTextColor="#787878"
-                        underlineColorAndroid="#787878"
-                        value={this.state.name}
-                        onChangeText={(text) => this.setState({ name: text })}
-                    />
-                    <TextInput
-                        placeholder="Descripción"
-                        placeholderTextColor="#787878"
-                        underlineColorAndroid="#787878"
-                        value={this.state.description}
-                        onChangeText={(text) => this.setState({ description: text })}
-                    />
-                    <View style={styles.buttonsContainer}>
-                        <Button
-                            style={styles.buttons}
-                            color="#24E189"
-                            onPress={() => this.pushTransaction()}
-                            title="Aceptar"
+                        </List>
+                        <TextInput
+                            placeholder="Nombre"
+                            placeholderTextColor="#787878"
+                            underlineColorAndroid="#787878"
+                            value={this.state.name}
+                            onChangeText={(text) => this.setState({ name: text })}
                         />
+                        <TextInput
+                            placeholder="Descripción"
+                            placeholderTextColor="#787878"
+                            underlineColorAndroid="#787878"
+                            value={this.state.description}
+                            onChangeText={(text) => this.setState({ description: text })}
+                        />
+                        <View style={styles.buttonsContainer}>
+                            <Button
+                                style={styles.buttons}
+                                color="#24E189"
+                                onPress={() => this.pushTransaction()}
+                                title="Aceptar"
+                            />
+                        </View>
                     </View>
-                </View>
-            </ParallaxScroll>
+                </ParallaxScroll>) : (
+                    <View style={styles.container}>
+                        <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
+                    </View>
+                )
         )
     }
 }
@@ -607,26 +801,30 @@ export class EditTransaction extends React.Component {
         const data = this.props.navigation.state.params.data;
         this.state = {
             language: "",
+            loading: true,
             inputValue: 10,
             modalVisible: false,
             paymentModalVisible: false,
-            dayId: data.dayId,
+            dayId: 0,
             id: data.id,
-            name: data.name,
+            name: data.title,
             description: data.description,
-            payment: data.payment,
-            paymentName: data.account,
+            user: null,
+            payment: data.financial_instrument,
+            paymentName: "",
             amount: data.amount,
+            categories: null,
+            payments: null,
             category: data.category,
-            categoryName: data.categoryName,
-            date: data.date,
+            categoryName: "",
+            date: 'Hoy a las 11:09PM',
             searchResult: categories,
             paymentSearchResult: payments,
-            formattedAmount: this.cashify(data.amount),
+            formattedAmount: '0.00',
             places: [],
             locationModalVisible: false,
             isLocationLoading: false,
-            location: data.location
+            location: data.place
 
         }
     }
@@ -678,7 +876,7 @@ export class EditTransaction extends React.Component {
     }
     searchPayment(query) {
         let result = [];
-        for (let val of payments) {
+        for (let val of this.state.payments) {
             let searchIn = removeDiacritics(val.name.toLowerCase());
             let term = removeDiacritics(query.toLowerCase())
             if (searchIn.search(term) >= 0) {
@@ -689,7 +887,7 @@ export class EditTransaction extends React.Component {
     }
     searchCategory(query) {
         let result = [];
-        for (let val of categories) {
+        for (let val of this.state.categories) {
             let searchIn = removeDiacritics(val.name.toLowerCase());
             let term = removeDiacritics(query.toLowerCase())
             if (searchIn.search(term) >= 0) {
@@ -758,202 +956,276 @@ export class EditTransaction extends React.Component {
     }
     pushTransaction() {
         let newTransaction = {
-            id: this.state.id,
-            name: this.state.name,
-            account: this.state.paymentName,
+            google_place_id: this.state.location.place_id,
+            title: this.state.name,
             amount: this.state.amount,
-            category: this.state.category,
-            categoryName: this.state.categoryName,
-            description: this.state.description,
-            date: this.state.date
+            financial_instrument_id: this.state.payment.id,
+            transaction_category_id: this.state.category.id,
+            description: this.state.description
         }
-        transactions[newTransaction.id] = newTransaction;
-        this.props.navigation.state.params.onSuccess();
-        this.props.navigation.dispatch(this.backAction);
-        ToastAndroid.show('La transacción se ha guardado', ToastAndroid.SHORT)
+
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/" + this.state.id, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newTransaction)
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson)
+                this.props.navigation.state.params.onSuccess();
+                this.props.navigation.dispatch(this.backAction);
+                ToastAndroid.show('La transacción se ha actualizado', ToastAndroid.SHORT)
+            })
+            .catch((error) => {
+                ToastAndroid.show(error.message, ToastAndroid.SHORT);
+
+            });
+
+    }
+    async getUser() {
+        try {
+            if (this.state.user == null) {
+                let user = await AsyncStorage.getItem('currentUser');
+                let value = JSON.parse(user);
+                console.log(value);
+                if (value !== null) {
+                    this.setState({ user: value.user }, () =>
+                        this.getCategories())
+                }
+            }
+        } catch (error) {
+            console.log('2value');
+
+        }
+    }
+    getInstruments() {
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/financial-instrument/by-account/" + this.state.user.account_id, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                this.setState({
+                    paymentSearchResult: responseJson.financial_instruments,
+                    payments: responseJson.financial_instruments,
+                    loading: false
+                })
+            })
+            .catch((error) => {
+                console.log(error);
+                ToastAndroid.show('Eso no e así viejooo...', 5);
+
+            });
+    }
+    getCategories() {
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction-category", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+                this.setState({
+                    searchResult: responseJson.transaction_categories,
+                    categories: responseJson.transaction_categories
+                }, () =>
+                        this.getInstruments())
+            })
+            .catch((error) => {
+                console.log(error);
+                ToastAndroid.show('Eso no e así viejoo...', 5);
+
+            });
+    }
+    getIcon(name) {
+        for (let obj of categoryIcons) {
+            if (obj.name == name) {
+                return obj.source
+            }
+        }
+        return null
+
+    }
+    componentWillMount() {
+        this.setState({ loading: true }, () => this.getUser())
     }
 
     render() {
         return (
-            <ParallaxScroll
-                style={{ backgroundColor: '#2C2F33' }}
-                parallaxHeight={500}
-                renderParallaxForeground={() => (
-                    <View style={{ height: 500, zIndex: 0, alignItems: 'center', justifyContent: 'center', zIndex: -100 }}>
-                        <Text style={{ fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10 }}>RD${this.state.formattedAmount}</Text>
-                        <View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => this.changeAmount(1)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>1</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(2)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>2</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(3)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>3</Text></View>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => this.changeAmount(4)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>4</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(5)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>5</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(6)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>6</Text></View>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity onPress={() => this.changeAmount(7)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>7</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(8)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>8</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(9)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>9</Text></View>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <TouchableOpacity>
-                                    <View style={styles.circleBlank}></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(0)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>0</Text></View>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.changeAmount(10)}>
-                                    <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>{"x"}</Text></View>
-                                </TouchableOpacity>
+            !this.state.loading ? (
+                <ParallaxScroll
+                    style={{ backgroundColor: '#2C2F33' }}
+                    parallaxHeight={500}
+                    renderParallaxForeground={() => (
+                        <View style={{ height: 500, zIndex: 0, alignItems: 'center', justifyContent: 'center', zIndex: -100 }}>
+                            <Text style={{ fontFamily: 'Circular', color: '#FFF', fontSize: 34, marginBottom: 10 }}>RD${this.cashify(this.state.amount)}</Text>
+                            <View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(1)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>1</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(2)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>2</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(3)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>3</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(4)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>4</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(5)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>5</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(6)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>6</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => this.changeAmount(7)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>7</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(8)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>8</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(9)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>9</Text></View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <TouchableOpacity>
+                                        <View style={styles.circleBlank}></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(0)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>0</Text></View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => this.changeAmount(10)}>
+                                        <View style={styles.circleBlank}><Text style={{ color: 'white', fontFamily: 'Circular', fontSize: 30 }}>{"x"}</Text></View>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                )}>
-                <View style={{ backgroundColor: 'white', borderRadius: 10, marginHorizontal: 10, zIndex: 100, height: (Dimensions.get('window').height - 85) }}>
-                    <Modal
-                        animationType="slide"
-                        visible={this.state.modalVisible}
-                        onRequestClose={() => { this.setModalVisible(!this.state.modalVisible) }}>
-                        <View flex={1}>
-                            <SearchBar
-                                inputStyle={{ fontFamily: 'Circular' }}
-                                placeholder='Buscar categoría'
-                                onChangeText={(text) => this.searchCategory(text)} />
-                            <List>
+                    )}>
+                    <View style={{ backgroundColor: 'white', borderRadius: 10, marginHorizontal: 10, zIndex: 100, height: (Dimensions.get('window').height - 85) }}>
+                        <Modal
+                            animationType="slide"
+                            visible={this.state.modalVisible}
+                            onRequestClose={() => { this.setModalVisible(!this.state.modalVisible) }}>
+                            <View flex={1}>
+                                <SearchBar
+                                    inputStyle={{ fontFamily: 'Circular' }}
+                                    placeholder='Buscar categoría'
+                                    onChangeText={(text) => this.searchCategory(text)} />
+                                <List>
+                                    {
+                                        this.state.searchResult.map((l, i) => (
+                                            <ListItem
+                                                avatar={l.avatar}
+                                                avatarStyle={{ backgroundColor: 'white' }}
+                                                fontFamily={'Circular'}
+                                                title={l.name}
+                                                hideChevron={true}
+                                                onPress={() => this.changeCategory(l)}
+                                                key={i}
+                                            />
+                                        ))
+                                    }
+                                </List>
+                            </View>
+                        </Modal>
+                        <Modal
+                            animationType="slide"
+                            visible={this.state.paymentModalVisible}
+                            onRequestClose={() => { this.setPaymentModalVisible(!this.state.paymentModalVisible) }}>
+                            <View flex={1}>
+                                <SearchBar
+                                    inputStyle={{ fontFamily: 'Circular' }}
+                                    placeholder='Buscar método de pago'
+                                    onChangeText={(text) => this.searchPayment(text)} />
+                                <List>
+                                    {
+                                        this.state.paymentSearchResult.map((l, i) => (
+                                            <ListItem
+                                                avatar={l.avatar}
+                                                avatarStyle={{ backgroundColor: 'white' }}
+                                                fontFamily={'Circular'}
+                                                title={l.name}
+                                                hideChevron={true}
+                                                onPress={() => this.changePayment(l)}
+                                                key={i}
+                                            />
+                                        ))
+                                    }
+                                </List>
+                            </View>
+                        </Modal>
+                        <Modal
+                            animationType="slide"
+                            visible={this.state.locationModalVisible}
+                            onRequestClose={() => { this.setLocationModalVisible(!this.state.locationModalVisible) }}>
+                            <ScrollView flex={1}>
+                                <SearchBar
+                                    inputStyle={{ fontFamily: 'Circular' }}
+                                    placeholder='Agregar ubicación'
+                                    onChangeText={(text) => this.searchLocation(text)} />
                                 {
-                                    this.state.searchResult.map((l, i) => (
-                                        <ListItem
-                                            avatar={l.avatar}
-                                            avatarStyle={{ backgroundColor: 'white' }}
-                                            fontFamily={'Circular'}
-                                            title={l.name}
-                                            hideChevron={true}
-                                            onPress={() => this.changeCategory(l)}
-                                            key={i}
-                                        />
-                                    ))
+                                    this.state.isLocationLoading ? <ActivityIndicator style={{ marginTop: 30 }} size="large" color="#24E189" /> : (
+                                        <List>
+                                            {
+                                                this.state.places.map((l, i) => (
+                                                    <ListItem
+                                                        fontFamily={'Circular'}
+                                                        title={l.name}
+                                                        subtitle={l.formatted_address}
+                                                        subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
+                                                        hideChevron={true}
+                                                        onPress={() => this.changeLocation(l)}
+                                                        key={i}
+                                                    />
+                                                ))
+                                            }
+                                        </List>
+                                    )
                                 }
-                            </List>
-                        </View>
-                    </Modal>
-                    <Modal
-                        animationType="slide"
-                        visible={this.state.paymentModalVisible}
-                        onRequestClose={() => { this.setPaymentModalVisible(!this.state.paymentModalVisible) }}>
-                        <View flex={1}>
-                            <SearchBar
-                                inputStyle={{ fontFamily: 'Circular' }}
-                                placeholder='Buscar método de pago'
-                                onChangeText={(text) => this.searchPayment(text)} />
-                            <List>
-                                {
-                                    this.state.paymentSearchResult.map((l, i) => (
-                                        <ListItem
-                                            avatar={l.avatar}
-                                            avatarStyle={{ backgroundColor: 'white' }}
-                                            fontFamily={'Circular'}
-                                            title={l.name}
-                                            hideChevron={true}
-                                            onPress={() => this.changePayment(l)}
-                                            key={i}
-                                        />
-                                    ))
-                                }
-                            </List>
-                        </View>
-                    </Modal>
-                    <Modal
-                        animationType="slide"
-                        visible={this.state.locationModalVisible}
-                        onRequestClose={() => { this.setLocationModalVisible(!this.state.locationModalVisible) }}>
-                        <ScrollView flex={1}>
-                            <SearchBar
-                                inputStyle={{ fontFamily: 'Circular' }}
-                                placeholder='Agregar ubicación'
-                                onChangeText={(text) => this.searchLocation(text)} />
+
+                            </ScrollView>
+                        </Modal>
+
+                        <List style={{ marginVertical: 5 }}>
                             {
-                                this.state.isLocationLoading ? <ActivityIndicator style={{ marginTop: 30 }} size="large" color="#24E189" /> : (
-                                    <List>
-                                        {
-                                            this.state.places.map((l, i) => (
-                                                <ListItem
-                                                    fontFamily={'Circular'}
-                                                    title={l.name}
-                                                    subtitle={l.formatted_address}
-                                                    subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
-                                                    hideChevron={true}
-                                                    onPress={() => this.changeLocation(l)}
-                                                    key={i}
-                                                />
-                                            ))
-                                        }
-                                    </List>
-                                )
-                            }
-
-                        </ScrollView>
-                    </Modal>
-
-                    <List style={{ marginVertical: 5 }}>
-                        {
-                            this.state.category != null ? (
-                                <ListItem
-                                    title={this.state.categoryName}
-                                    onPress={() => { this.setModalVisible(true) }}
-                                    hideChevron={true}
-                                    fontFamily={'Circular'}
-                                    leftIcon={<Image
-                                        style={{ width: 24, height: 24, marginRight: 6 }}
-                                        source={this.state.category}
-                                    />}
-                                />
-                            ) : (
+                                this.state.category != null ? (
                                     <ListItem
-                                        title={'Seleccionar categoría'}
+                                        title={this.state.category.name}
                                         onPress={() => { this.setModalVisible(true) }}
                                         hideChevron={true}
                                         fontFamily={'Circular'}
                                         leftIcon={<Image
                                             style={{ width: 24, height: 24, marginRight: 6 }}
-                                            source={require('../../../assets/img/icons/category.png')}
+                                            source={this.getIcon(this.state.category.icon)}
                                         />}
                                     />
-                                )}
-                        {
-                            this.state.payment != null ? (
-                                <ListItem
-                                    title={this.state.paymentName}
-                                    onPress={() => { this.setPaymentModalVisible(true) }}
-                                    hideChevron={true}
-                                    fontFamily={'Circular'}
-                                    leftIcon={<Image
-                                        style={{ width: 24, height: 24, marginRight: 6 }}
-                                        source={this.state.payment}
-                                    />}
-                                />
-                            ) : (
+                                ) : (
+                                        <ListItem
+                                            title={'Seleccionar categoría'}
+                                            onPress={() => { this.setModalVisible(true) }}
+                                            hideChevron={true}
+                                            fontFamily={'Circular'}
+                                            leftIcon={<Image
+                                                style={{ width: 24, height: 24, marginRight: 6 }}
+                                                source={require('../../../assets/img/icons/category.png')}
+                                            />}
+                                        />
+                                    )}
+                            {
+                                this.state.payment != null ? (
                                     <ListItem
-                                        title={'¿Cómo pagaste?'}
+                                        title={this.state.payment.identifier}
                                         onPress={() => { this.setPaymentModalVisible(true) }}
                                         hideChevron={true}
                                         fontFamily={'Circular'}
@@ -962,65 +1234,89 @@ export class EditTransaction extends React.Component {
                                             source={require('../../../assets/img/icons/point-of-service.png')}
                                         />}
                                     />
-                                )
-                        }
-                        {
-                            this.state.location != null ? (
-                                <ListItem
-                                    title={this.state.location.name}
-                                    onPress={() => { this.setLocationModalVisible(true) }}
-                                    hideChevron={true}
-                                    fontFamily={'Circular'}
-                                    leftIcon={<Image
-                                        style={{ width: 24, height: 24, marginRight: 6 }}
-                                        source={require('../../../assets/img/icons/placeholder.png')}
-                                    />}
-                                />
-                            ) : (
+                                ) : (
+                                        <ListItem
+                                            title={'¿Cómo pagaste?'}
+                                            onPress={() => { this.setPaymentModalVisible(true) }}
+                                            hideChevron={true}
+                                            fontFamily={'Circular'}
+                                            leftIcon={<Image
+                                                style={{ width: 24, height: 24, marginRight: 6 }}
+                                                source={require('../../../assets/img/icons/point-of-service.png')}
+                                            />}
+                                        />
+                                    )
+                            }
+                            {
+                                this.state.location != null ? (
                                     <ListItem
-                                        title={'Agregar ubicación'}
+                                        title={this.state.location.name}
                                         onPress={() => { this.setLocationModalVisible(true) }}
                                         hideChevron={true}
                                         fontFamily={'Circular'}
                                         leftIcon={<Image
                                             style={{ width: 24, height: 24, marginRight: 6 }}
-                                            source={require('../../../assets/img/icons/map.png')}
+                                            source={require('../../../assets/img/icons/placeholder.png')}
                                         />}
                                     />
-                                )
-                        }
+                                ) : (
+                                        <ListItem
+                                            title={'Agregar ubicación'}
+                                            onPress={() => { this.setLocationModalVisible(true) }}
+                                            hideChevron={true}
+                                            fontFamily={'Circular'}
+                                            leftIcon={<Image
+                                                style={{ width: 24, height: 24, marginRight: 6 }}
+                                                source={require('../../../assets/img/icons/map.png')}
+                                            />}
+                                        />
+                                    )
+                            }
 
 
-                    </List>
-                    <TextInput
-                        placeholder="Nombre"
-                        placeholderTextColor="#787878"
-                        underlineColorAndroid="#787878"
-                        value={this.state.name}
-                        onChangeText={(text) => this.setState({ name: text })}
-                    />
-                    <TextInput
-                        placeholder="Descripción"
-                        placeholderTextColor="#787878"
-                        underlineColorAndroid="#787878"
-                        value={this.state.description}
-                        onChangeText={(text) => this.setState({ description: text })}
-                    />
-                    <View style={styles.buttonsContainer}>
-                        <Button
-                            style={styles.buttons}
-                            color="#24E189"
-                            onPress={() => this.pushTransaction()}
-                            title="Aceptar"
+                        </List>
+                        <TextInput
+                            placeholder="Nombre"
+                            placeholderTextColor="#787878"
+                            underlineColorAndroid="#787878"
+                            value={this.state.name}
+                            onChangeText={(text) => this.setState({ name: text })}
                         />
+                        <TextInput
+                            placeholder="Descripción"
+                            placeholderTextColor="#787878"
+                            underlineColorAndroid="#787878"
+                            value={this.state.description}
+                            onChangeText={(text) => this.setState({ description: text })}
+                        />
+                        <View style={styles.buttonsContainer}>
+                            <Button
+                                style={styles.buttons}
+                                color="#24E189"
+                                onPress={() => this.pushTransaction()}
+                                title="Aceptar"
+                            />
+                        </View>
                     </View>
-                </View>
-            </ParallaxScroll>
+                </ParallaxScroll>
+            ) : (
+                    <View style={styles.container}>
+                        <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
+                    </View>
+                )
         )
     }
 }
 
 export class TransactionDetail extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            loading: true,
+            data: null,
+            shouldUpdate: false
+        }
+    }
     static navigationOptions = {
         title: 'Detalle de la transacción',
         headerStyle: {
@@ -1047,10 +1343,25 @@ export class TransactionDetail extends React.Component {
                 { text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
                 {
                     text: 'Eliminar', onPress: () => {
-                        transactions.splice(this.props.navigation.state.params.data.id, 1);
-                        this.props.navigation.state.params.onSuccess();
-                        this.props.navigation.dispatch(this.backAction);
-                        ToastAndroid.show('La transacción se ha eliminado', ToastAndroid.SHORT)
+                        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/" + this.props.navigation.state.params.data.id, {
+                            method: 'DELETE',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            }
+                        }).then((response) => response.json())
+                            .then((responseJson) => {
+                                console.log(responseJson);
+                                this.props.navigation.state.params.onSuccess();
+                                this.props.navigation.dispatch(this.backAction);
+                                ToastAndroid.show('La transacción se ha eliminado', ToastAndroid.SHORT)
+
+                            })
+                            .catch((error) => {
+                                ToastAndroid.show('No se pudo eliminar la transacción', 3)
+                                console.log(error)
+
+                            });
 
                     }
                 },
@@ -1059,7 +1370,16 @@ export class TransactionDetail extends React.Component {
         )
     }
     refresh() {
-        this.render();
+        this.setState({loading: true}, () => this.getTransactionInfo())
+    }
+    getIcon(name) {
+        for (let obj of categoryIcons) {
+            if (obj.name == name) {
+                return obj.source
+            }
+        }
+        return null
+
     }
     cashify(amountIn) {
 
@@ -1075,10 +1395,32 @@ export class TransactionDetail extends React.Component {
         return splitAmount + "." + amount.split(".")[1];
 
     }
-    render() {
-        const data = this.props.navigation.state.params.data;
-        return (
+    getTransactionInfo() {
+        let id = this.props.navigation.state.params.data.id
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/" + id, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            }
+                        }).then((response) => response.json())
+                            .then((responseJson) => {
+                                console.log(responseJson);
+                                this.setState({data: responseJson.transaction, loading: false})
+                            })
+                            .catch((error) => {
+                                ToastAndroid.show('Ve a ver', 3)
+                                console.log(error)
 
+                            });
+    }
+    componentWillMount() {
+        this.getTransactionInfo()
+    }
+    render() {
+        const data = this.state.data;
+        return (
+            !this.state.loading ? (
             <View style={{ backgroundColor: 'white', flex: 1 }}>
                 <View style={{ backgroundColor: '#2C2F33', paddingVertical: 15 }}>
                     <View style={{ marginTop: 30 }}>
@@ -1086,13 +1428,13 @@ export class TransactionDetail extends React.Component {
                             <View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <View style={{ flex: 5 }}>
-                                        <Text style={{ fontFamily: 'Circular', color: 'black', fontSize: 20 }}>{data.name}</Text>
-                                        <Text style={{ fontFamily: 'Circular', fontSize: 12 }}>{data.categoryName}</Text>
+                                        <Text style={{ fontFamily: 'Circular', color: 'black', fontSize: 20 }}>{data.title}</Text>
+                                        <Text style={{ fontFamily: 'Circular', fontSize: 12 }}>{data.category.name}</Text>
                                     </View>
                                     <View style={{ flex: 1 }}>
                                         <Image
                                             style={{ width: 36, height: 36, marginLeft: 6 }}
-                                            source={data.category}
+                                            source={this.getIcon(data.category.icon)}
                                         />
                                     </View>
                                 </View>
@@ -1103,7 +1445,7 @@ export class TransactionDetail extends React.Component {
                             </View>
                             <List>
                                 <ListItem
-                                    title={data.date}
+                                    title={formatDate(data.created_at, true)}
                                     hideChevron={true}
                                     leftIcon={<Image
                                         style={{ width: 24, height: 24, marginRight: 6 }}
@@ -1113,7 +1455,7 @@ export class TransactionDetail extends React.Component {
                                     fontFamily={'Circular'}
                                 />
                                 <ListItem
-                                    title={data.account}
+                                    title={data.financial_instrument.identifier}
                                     hideChevron={true}
                                     leftIcon={<Image
                                         style={{ width: 24, height: 24, marginRight: 6 }}
@@ -1154,22 +1496,26 @@ export class TransactionDetail extends React.Component {
 
                     <MapView style={{ width: Dimensions.get('window').width, height: 200, marginBottom: 40 }}
                         initialRegion={{
-                            latitude: 18.4874874,
-                            longitude: -69.9645857,
+                            latitude: data.place.lat,
+                            longitude: data.place.lon,
                             latitudeDelta: 0.0922,
                             longitudeDelta: 0.0421,
                         }}
                         zoomEnabled={false}
                         scrollEnabled={false}>
                         <MapView.Marker coordinate={{
-                            latitude: 18.4874874,
-                            longitude: -69.9645857
+                            latitude: data.place.lat,
+                            longitude: data.place.lon,
                         }} />
                     </MapView>
 
                 </ScrollView>
             </View>
-
+                    ) : (
+                        <View style={styles.container}>
+                        <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
+                    </View>
+                    )
         );
     }
 }

@@ -9,7 +9,8 @@ import {
     TextInput,
     Button,
     ToastAndroid,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    AsyncStorage
 } from 'react-native'
 
 const baseUrl = 'https://chelify-nicoavn.c9users.io/chelify_server/public/';
@@ -25,6 +26,12 @@ export class Register extends React.Component {
             NavigationActions.navigate({ routeName: 'Welcome' })
         ]
     })
+    async save(obj) {
+        await AsyncStorage.setItem('currentUser', JSON.stringify(obj))
+    }
+    leave() {
+        this.props.navigation.dispatch(this.resetAction);
+    }
     userLogin() {
         fetch(registerApi, {
             method: 'POST',
@@ -40,7 +47,8 @@ export class Register extends React.Component {
         }).then((response) => response.json())
             .then((responseJson) => {
                 console.log(responseJson)
-                ToastAndroid.show('El usuario ta jevi', ToastAndroid.SHORT);
+                this.save(responseJson);
+                this.leave()
             })
             .catch((error) => {
                 console.log(error);
