@@ -1,5 +1,4 @@
 import {ToastAndroid} from 'react-native';
-import { Settings } from '../settings';
 export const users = [
     {
         name: "Anastasia Martinez",
@@ -44,6 +43,7 @@ export const users = [
         image: {uri: 'https://randomuser.me/api/portraits/men/53.jpg'}
     }
 ];
+import Settings from '../settings'
 
 const loginApi = Settings.baseUrl + '/auth/login';
 

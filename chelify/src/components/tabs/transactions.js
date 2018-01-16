@@ -44,6 +44,7 @@ import ParallaxScroll from '@monterosa/react-native-parallax-scroll';
 import transactions from '../../api/transactions'
 import payments from '../../api/payments'
 import categoryIcons from '../../util/icons'
+import Settings from '../../settings'
 
 let formatDate = (date, time) => {
     let year = new Date().getFullYear()
@@ -119,7 +120,7 @@ export class Transactions extends React.Component {
         this.state = {
             trans: transactions,
             loading: true,
-            user: null
+            user: null,
         }
     }
     static navigationOptions = {
@@ -133,32 +134,30 @@ export class Transactions extends React.Component {
     async getUser() {
         try {
             if (this.state.user == null) {
-
-
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
                 console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () => {
-
                         this.getTransactions();
                     })
                 }
             }
         } catch (error) {
-            console.log('2value');
-
+            console.log('value');
         }
     }
     componentWillReceiveProps(nextProps) {
         console.log(nextProps)
     }
     getTransactions() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/by-account/" + this.state.user.account_id, {
+        //console.log(this.state.user);
+        fetch(Settings.baseUrl + "/api/transaction/by-account/" + this.state.user.account_id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer ' + this.state.user.access_token
             }
         }).then((response) => response.json())
             .then((responseJson) => {
@@ -451,7 +450,7 @@ export class AddTransaction extends React.Component {
             transaction_category_id: this.state.category.id
         }
 
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction", {
+        fetch(Settings.baseUrl + "/api/transaction", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -488,7 +487,7 @@ export class AddTransaction extends React.Component {
         }
     }
     getInstruments() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/financial-instrument/by-account/" + this.state.user.account_id, {
+        fetch(Settings.baseUrl + "/api/financial-instrument/by-account/" + this.state.user.account_id, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -509,7 +508,7 @@ export class AddTransaction extends React.Component {
             });
     }
     getCategories() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction-category", {
+        fetch(Settings.baseUrl + "/api/transaction-category", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -966,7 +965,7 @@ export class EditTransaction extends React.Component {
             description: this.state.description
         }
 
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/" + this.state.id, {
+        fetch(Settings.baseUrl + "/api/transaction/" + this.state.id, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -1003,7 +1002,7 @@ export class EditTransaction extends React.Component {
         }
     }
     getInstruments() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/financial-instrument/by-account/" + this.state.user.account_id, {
+        fetch(Settings.baseUrl + "/api/financial-instrument/by-account/" + this.state.user.account_id, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -1024,7 +1023,7 @@ export class EditTransaction extends React.Component {
             });
     }
     getCategories() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction-category", {
+        fetch(Settings.baseUrl + "/api/transaction-category", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -1347,7 +1346,7 @@ export class TransactionDetail extends React.Component {
                 { text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
                 {
                     text: 'Eliminar', onPress: () => {
-                        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/" + this.props.navigation.state.params.data.id, {
+                        fetch(Settings.baseUrl + "/api/transaction/" + this.props.navigation.state.params.data.id, {
                             method: 'DELETE',
                             headers: {
                                 'Accept': 'application/json',
@@ -1401,11 +1400,11 @@ export class TransactionDetail extends React.Component {
     }
     getTransactionInfo() {
         let id = this.props.navigation.state.params.data.id
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/" + id, {
+        fetch(Settings.baseUrl + "/api/transaction/" + id, {
                             method: 'GET',
                             headers: {
                                 'Accept': 'application/json',
-                                'Content-Type': 'application/json',
+                                'Content-Type': 'application/json'
                             }
                         }).then((response) => response.json())
                             .then((responseJson) => {
@@ -1415,7 +1414,6 @@ export class TransactionDetail extends React.Component {
                             .catch((error) => {
                                 ToastAndroid.show('Ve a ver', 3)
                                 console.log(error)
-
                             });
     }
     componentWillMount() {

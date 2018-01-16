@@ -14,7 +14,7 @@ import {
     AsyncStorage,
     ToastAndroid
 } from 'react-native'
-import { login } from '../api/users';
+//import { login } from '../api/users';
 const baseUrl = 'https://chelify-nicoavn.c9users.io/chelify_server/public';
 const loginApi = baseUrl + '/api/auth/login';
 export class Login extends React.Component {
