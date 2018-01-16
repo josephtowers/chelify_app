@@ -22,16 +22,7 @@ let data = {
 let it = 
 [
     {x: 'Comida', y: 50},
-    {x: 'Romo', y: 250},
-    {x: 'Leche', y: 500},
-    {x: 'Semilla', y: 420},
-    {x: 'Pene', y: 110},
-    {x: 'Pene', y: 110},
-    {x: 'Penee', y: 110},
-    {x: 'Peneee', y: 110},
-    {x: 'Peneeee', y: 110},
-    {x: 'Peneeeee', y: 110},
-    {x: 'Ropa', y: 100}
+    {x: 'Romo', y: 250}
 ]
 export const generate = (text) => {
     let dataset = data;

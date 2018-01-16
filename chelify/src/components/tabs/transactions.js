@@ -766,6 +766,7 @@ export class AddTransaction extends React.Component {
                             placeholderTextColor="#787878"
                             underlineColorAndroid="#787878"
                             value={this.state.name}
+                            style={{fontFamily: 'Circular'}}
                             onChangeText={(text) => this.setState({ name: text })}
                         />
                         <TextInput
@@ -773,6 +774,7 @@ export class AddTransaction extends React.Component {
                             placeholderTextColor="#787878"
                             underlineColorAndroid="#787878"
                             value={this.state.description}
+                            style={{fontFamily: 'Circular'}}
                             onChangeText={(text) => this.setState({ description: text })}
                         />
                         <View style={styles.buttonsContainer}>
@@ -1280,6 +1282,7 @@ export class EditTransaction extends React.Component {
                             placeholderTextColor="#787878"
                             underlineColorAndroid="#787878"
                             value={this.state.name}
+                            style={{fontFamily: 'Circular'}}
                             onChangeText={(text) => this.setState({ name: text })}
                         />
                         <TextInput
@@ -1287,6 +1290,7 @@ export class EditTransaction extends React.Component {
                             placeholderTextColor="#787878"
                             underlineColorAndroid="#787878"
                             value={this.state.description}
+                            style={{fontFamily: 'Circular'}}
                             onChangeText={(text) => this.setState({ description: text })}
                         />
                         <View style={styles.buttonsContainer}>

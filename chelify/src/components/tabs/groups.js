@@ -907,14 +907,10 @@ export class AddGroup extends React.Component {
     }
     pushGroup() {
         let newGroup = {
-            amount: this.state.amount,
+            manager_id: this.state.user.id,
             groupUsers: this.state.groupUsers,
             name: this.state.name,
-            goal: this.state.amount,
-            transactions: [],
-            balance: 0,
-            description: this.state.description,
-            avatar: require('../../../assets/img/welcome/screen4.png')
+            goal: this.state.amount
         }
 
         groups.push(newGroup);
