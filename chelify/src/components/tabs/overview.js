@@ -25,6 +25,7 @@ import styles from '../../styles/style.js'
 //var ImagePicker = require('react-native-image-picker');
 import users from '../../api/users.js'
 import Chart from 'react-native-chart';
+import Settings from '../../settings'
 const assets = [
     {
         name: "Efectivo",
@@ -86,7 +87,7 @@ export class Overview extends React.Component {
         }
     }
     getImage() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/by-account/" + this.state.user.account_id, {
+        fetch(Settings.baseUrl + "/api/image/by-account/" + this.state.user.account_id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -96,7 +97,7 @@ export class Overview extends React.Component {
             .then((responseJson) => {
                 console.log(responseJson);
                 if(responseJson.images.length)
-                this.setState({ image: {uri: "https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/show/" + responseJson.images[responseJson.images.length - 1].file_name},
+                this.setState({ image: {uri: Settings.baseUrl + "/api/image/show/" + responseJson.images[responseJson.images.length - 1].file_name},
             loading: false })
             else this.setState({image: require('../../../assets/img/add-picture.jpg'), loading: false})
             })
@@ -106,7 +107,7 @@ export class Overview extends React.Component {
             });
     }
     getSummary() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/transaction/month-summary/" + this.state.user.account_id, {
+        fetch(Settings.baseUrl + "/api/transaction/month-summary/" + this.state.user.account_id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -240,7 +241,7 @@ export class Overview extends React.Component {
                 type: 'image/jpeg', // or photo.type
                 name: 'testPhotoName'
             });
-            fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/upload", {
+            fetch(Settings.baseUrl + "/api/image/upload", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data;',

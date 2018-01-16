@@ -12,6 +12,7 @@ import removeDiacritics from '../../util/removeDiacritics.js'
 import ParallaxScroll from '@monterosa/react-native-parallax-scroll';
 import users from '../../api/users.js'
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import Settings from '../../settings'
 
 var ImagePicker = require('react-native-image-picker');
 import {
@@ -83,7 +84,7 @@ export class Groups extends React.Component {
         }
     }
     getGroups() {
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/group/by-user/" + this.state.user.id, {
+        fetch(Settings.baseUrl + "/api/group/by-user/" + this.state.user.id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -266,7 +267,7 @@ export class GroupDetails extends React.Component {
     }
     getGroupInfo() {
         let id = this.props.navigation.state.params.data.id
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/group/" + id, {
+        fetch(Settings.baseUrl + "/api/group/" + id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -470,7 +471,7 @@ export class GroupTransactions extends React.Component {
     }
     pushInput() {
         
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/group/add-contribution", {
+        fetch(Settings.baseUrl + "/api/group/add-contribution", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -497,7 +498,7 @@ export class GroupTransactions extends React.Component {
     }
     searchTransactions() {
         let id = this.state.data.id
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/group/" + id + "/contributions", {
+        fetch(Settings.baseUrl + "/api/group/" + id + "/contributions", {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -643,7 +644,7 @@ export class Members extends React.Component {
     }
     async getImage(id) {
 
-        await fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/by-account/" + id, {
+        await fetch(Settings.baseUrl + "/api/image/by-account/" + id, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -653,7 +654,7 @@ export class Members extends React.Component {
             .then((responseJson) => {
                 console.log(responseJson);
                 if (responseJson.images.length)
-                    return { uri: "https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/show/" + responseJson.images[responseJson.images.length - 1].file_name }
+                    return { uri: Settings.baseUrl + "/api/image/show/" + responseJson.images[responseJson.images.length - 1].file_name }
                 else return require('../../../assets/img/add-picture.jpg')
             })
             .catch((error) => {
@@ -665,7 +666,7 @@ export class Members extends React.Component {
     addMember() {
         let data = this.props.screenProps.data;
         let newMember = this.state.newUser
-        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/group/add-member-by-email", {
+        fetch(Settings.baseUrl + "/api/group/add-member-by-email", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
