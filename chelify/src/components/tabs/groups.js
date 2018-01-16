@@ -600,7 +600,8 @@ export class GroupTransactions extends React.Component {
                                         roundAvatar
                                         rightTitleStyle={{ fontWeight: "100", fontFamily: 'Circular' }}
                                         fontFamily={"Circular"}
-                                        title={l.user_id}
+                                        avatar={{uri: "https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/show/" + l.user.profile_images[0].file_name}}
+                                        title={l.user.name}
                                         rightTitle={"RD$" + this.cashify(l.amount)}
                                     />
                                 ))
@@ -841,7 +842,9 @@ export class AddGroup extends React.Component {
             incomingUser: '',
             groupUsers: [],
             name: '',
-            description: ''
+            description: '',
+            user: null,
+            loading: true
         }
     }
     static navigationOptions = {
@@ -909,20 +912,52 @@ export class AddGroup extends React.Component {
     pushGroup() {
         let newGroup = {
             manager_id: this.state.user.id,
-            groupUsers: this.state.groupUsers,
-            name: this.state.name,
-            goal: this.state.amount
+            members_emails: this.state.groupUsers,
+            title: this.state.name,
+            target_amount: this.state.amount
         }
 
-        groups.push(newGroup);
+        fetch("https://chelify-nicoavn.c9users.io/chelify_server/public/api/group", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newGroup)
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson)
+                this.props.navigation.state.params.onSuccess();
+                this.props.navigation.dispatch(this.backAction);
+                ToastAndroid.show('Se ha creado el grupo', ToastAndroid.SHORT)
+            })
+            .catch((error) => {
+                ToastAndroid.show(error.message, ToastAndroid.SHORT);
 
-        this.props.navigation.state.params.onSuccess();
-        this.props.navigation.dispatch(this.backAction);
-        ToastAndroid.show('La transacción se ha agregado', ToastAndroid.SHORT)
+            });
     }
 
+    async getUser() {
+        try {
+            if (this.state.user == null) {
+                let user = await AsyncStorage.getItem('currentUser');
+                let value = JSON.parse(user);
+                console.log(value);
+                if (value !== null) {
+                    this.setState({ user: value.user, loading: false })
+                }
+            }
+        } catch (error) {
+            console.log('2value');
+
+        }
+    }
+    componentWillMount() {
+        this.getUser();
+    }
     render() {
         return (
+            !this.state.loading ? (
             <ParallaxScroll
                 style={{ backgroundColor: '#2C2F33' }}
                 parallaxHeight={500}
@@ -1029,6 +1064,11 @@ export class AddGroup extends React.Component {
                     </View>
                 </View>
             </ParallaxScroll>
+                    ) : (
+                        <View style={styles.container}>
+                        <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
+                    </View>
+                    )
         )
     }
 }
