@@ -10,7 +10,8 @@ import {
     Button,
     ToastAndroid,
     KeyboardAvoidingView,
-    AsyncStorage
+    AsyncStorage,
+    Keyboard
 } from 'react-native'
 
 const baseUrl = 'https://chelify-nicoavn.c9users.io/chelify_server/public/';
@@ -51,7 +52,8 @@ export class Register extends React.Component {
                 this.leave()
             })
             .catch((error) => {
-                console.log(error);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
             });
     }
     backAction = NavigationActions.back();
@@ -61,13 +63,91 @@ export class Register extends React.Component {
         this.state = {
             name: '',
             email: '',
+            emailConfirmation: '',
             password: '',
+            passwordConfirmation: '',
             nameError: false,
             emailError: false,
             emailConfirmationError: false,
             passwordError: false,
             passwordConfirmationError: false
         }
+    }
+    validateEmail(email) {
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email.toLowerCase());
+    }
+    validateName() {
+        
+        let nameError = false;
+        if(this.state.name.length == 0) {
+            nameError = true
+        }
+        this.setState({nameError: nameError})
+    }
+    validateUserEmail() {
+        let emailError = false;
+        if(!this.validateEmail(this.state.email)) {
+            emailError = true
+        }
+        this.setState({emailError: emailError})
+    }
+    validateUserEmailConf() {
+        let emailConfirmationError = false;
+        if(this.state.email != this.state.emailConfirmation) {
+            emailConfirmationError = true
+        }
+        this.setState({emailConfirmationError: emailConfirmationError})
+    }
+    validatePassword() {
+        let passwordError = false;
+        if(this.state.password.length < 8) {
+            passwordError = true
+        }
+        this.setState({passwordError: passwordError})
+    }
+    validatePasswordConf() {
+        let passwordConfirmationError = false;
+        if(this.state.password != this.state.passwordConfirmation) {
+            passwordConfirmationError = true
+        }
+        this.setState({passwordConfirmationError: passwordConfirmationError})
+    }
+    validate() {
+        Keyboard.dismiss()
+        let errors = 0;
+        let nameError = false;
+        let emailError = false;
+        let emailConfirmationError = false;
+        let passwordError = false;
+        let passwordConfirmationError = false;
+        if(this.state.name.length == 0) {
+            nameError = true
+            errors++
+        }
+        if(!this.validateEmail(this.state.email)) {
+            emailError = true
+            errors++
+        }
+        if(this.state.email != this.state.emailConfirmation) {
+            emailConfirmationError = true
+            errors++
+        }
+        if(this.state.password.length < 8) {
+            passwordError = true
+            errors++
+        }
+        if(this.state.password != this.state.passwordConfirmation) {
+            passwordConfirmationError = true
+            errors++
+        }
+        this.setState({
+            nameError: nameError,
+            emailError: emailError,
+            emailConfirmationError: emailConfirmationError,
+            passwordError: passwordError,
+            passwordConfirmationError: passwordConfirmationError
+        }, () => !errors && this.userLogin())
     }
     render() {
         return (
@@ -86,6 +166,7 @@ export class Register extends React.Component {
                         underlineColorAndroid="#787878"
                         onChangeText={(name) => this.setState({ name })}
                         value={this.state.name}
+                        onBlur={() => this.validateName()}
                     />
                     {
                         this.state.nameError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Introduce tu nombre</Text>
@@ -100,6 +181,7 @@ export class Register extends React.Component {
                         onChangeText={(email) => this.setState({ email })}
                         value={this.state.email}
                         autoCapitalize="none"
+                        onBlur={() => this.validateUserEmail()}
                     />
                     {
                         this.state.emailError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Introduce un correo válido</Text>
@@ -111,7 +193,10 @@ export class Register extends React.Component {
                         placeholder="Repetir correo electrónico"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
+                        value={this.state.emailConfirmation}
+                        onChangeText={(text) => this.setState({emailConfirmation: text})}
                         autoCapitalize="none"
+                        onBlur={() => this.validateUserEmailConf()}
                     />
                     {
                         this.state.emailConfirmationError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Los correos no coinciden</Text>
@@ -126,6 +211,7 @@ export class Register extends React.Component {
                         onChangeText={(password) => this.setState({ password })}
                         value={this.state.password}
                         autoCapitalize="none"
+                        onBlur={() => this.validatePassword()}
                     />
                     {
                         this.state.passwordError && <Text style={{color: 'red', fontFamily: 'Circular'}}>La contraseña debe tener entre 8 y 16 caracteres</Text>
@@ -137,7 +223,10 @@ export class Register extends React.Component {
                         placeholder="Repetir contraseña"
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
+                        value={this.state.passwordConfirmation}
                         autoCapitalize="none"
+                        onChangeText={(text) => this.setState({passwordConfirmation: text})}
+                        onBlur={() => this.validatePasswordConf()}
                     />
                     {
                         this.state.passwordConfirmationError && <Text style={{color: 'red', fontFamily: 'Circular'}}>Las contraseñas no coinciden</Text>
@@ -147,7 +236,7 @@ export class Register extends React.Component {
                     <Button
                         style={styles.buttons}
                         color="#24E189"
-                        onPress={() => this.userLogin()}
+                        onPress={() => this.validate()}
                         title="Crear cuenta"
                     />
                 </View>

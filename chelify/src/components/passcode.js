@@ -67,10 +67,10 @@ export class Passcode extends React.Component {
                   })
               }
             }
-            this.setState({animating: false})
           } catch (error) {
             // Error retrieving data
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
             
           }
     }
@@ -101,7 +101,8 @@ export class Passcode extends React.Component {
             
           } catch (error) {
             // Error retrieving data
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
             
           }
     }

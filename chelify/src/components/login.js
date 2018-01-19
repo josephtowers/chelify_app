@@ -8,6 +8,7 @@ import {
     ActivityIndicator,
     StatusBar,
     Image,
+    Keyboard,
     TextInput,
     Button,
     Dimensions,
@@ -44,13 +45,11 @@ export class Login extends React.Component {
                 this.props.navigation.dispatch(Login.goToPasscodePage)
             }
         } catch (error) {
-            // Error retrieving data
-            console.log('2value');
 
         }
     }
     async save(obj) {
-        await AsyncStorage.setItem('currentUser', JSON.stringify(obj), () => console.log('Guarde a fulanito'))
+        await AsyncStorage.setItem('currentUser', JSON.stringify(obj))
     }
     leave() {
         this.props.navigation.dispatch(Login.resetAction);
@@ -58,7 +57,6 @@ export class Login extends React.Component {
     async saveCurrentUser(obj) {
         try {
             if (obj != null && obj.access_token != null) {
-                console.log('suavecito')
                 this.save(obj)
                 setTimeout(() => this.leave(), 5000)
                   
@@ -68,10 +66,8 @@ export class Login extends React.Component {
             }
         }
         catch (error) {
-            // Error retrieving data
-            ToastAndroid.show('lol', ToastAndroid.SHORT)
-            console.log(error);
-
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+            this.setState({animating: false})
         }
     }
     componentDidMount() {
@@ -90,19 +86,20 @@ export class Login extends React.Component {
             })
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.saveCurrentUser(responseJson);
             })
             .catch((error) => {
-                console.log(error)
-                console.log('Lo mandé a ' + loginApi)
-
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+                this.setState({animating: false})
             });
     }
+    startAnimating() {
+        this.setState({ animating: true }, () => this.loginAction())
+    }
     async loginAction() {
-        console.log('toy aqui')
-        this.setState({ animating: true });
-        this.logMeIn(this.state.email, this.state.password)
+        Keyboard.dismiss()
+        this.logMeIn(this.state.email, this.state.password);
+        
     }
 
     static goToPasscodePage = NavigationActions.reset({
@@ -152,7 +149,7 @@ export class Login extends React.Component {
                         <Button
                             style={styles.buttons}
                             color="#24E189"
-                            onPress={() => this.loginAction()}
+                            onPress={() => this.startAnimating()}
                             title="Iniciar sesión"
                         />
                         <Button
@@ -162,7 +159,10 @@ export class Login extends React.Component {
                             title="Nueva cuenta"
                         />
                     </View>
-                    <ActivityIndicator size="large" color="#24E189" animating={this.state.animating} />
+                    {
+                        this.state.animating && <ActivityIndicator size="large" color="#24E189" />
+                    }
+                    
                 </Animatable.View>
             </View>
 

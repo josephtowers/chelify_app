@@ -14,6 +14,7 @@ import {
     Alert,
     Modal,
     Dimensions,
+    BackHandler,
     Linking,
     TouchableOpacity,
     ActivityIndicator,
@@ -88,7 +89,6 @@ let groupTransactionsByDate = (arr) => {
         }
         res.push(newGroup)
     }
-    console.log(res);
     return res
 }
 
@@ -136,7 +136,6 @@ export class Transactions extends React.Component {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () => {
                         this.getTransactions();
@@ -144,14 +143,11 @@ export class Transactions extends React.Component {
                 }
             }
         } catch (error) {
-            console.log('value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
         }
     }
-    componentWillReceiveProps(nextProps) {
-        console.log(nextProps)
-    }
     getTransactions() {
-        //console.log(this.state.user);
         fetch(Settings.baseUrl + "/api/transaction/by-account/" + this.state.user.account_id, {
             method: 'GET',
             headers: {
@@ -161,12 +157,11 @@ export class Transactions extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({ trans: responseJson.transactions, loading: false, refreshing: false })
             })
             .catch((error) => {
-                ToastAndroid.show('2', 3)
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -274,7 +269,7 @@ export class Transactions extends React.Component {
                         </View>
                     )
             ) : (
-                    <View style={styles.container}>
+                    <View style={styles.whiteContainer}>
                         <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
                     </View>
                 ))
@@ -447,7 +442,8 @@ export class AddTransaction extends React.Component {
             title: this.state.name,
             amount: this.state.amount,
             financial_instrument_id: this.state.payment.id,
-            transaction_category_id: this.state.category.id
+            transaction_category_id: this.state.category.id,
+            description: this.state.description
         }
 
         fetch(Settings.baseUrl + "/api/transaction", {
@@ -459,13 +455,13 @@ export class AddTransaction extends React.Component {
             body: JSON.stringify(newTransaction)
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson)
                 this.props.navigation.state.params.onSuccess();
                 this.props.navigation.dispatch(this.backAction);
                 ToastAndroid.show('La transacción se ha agregado', ToastAndroid.SHORT)
             })
             .catch((error) => {
-                ToastAndroid.show(error.message, ToastAndroid.SHORT);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
 
@@ -475,14 +471,14 @@ export class AddTransaction extends React.Component {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () =>
                         this.getCategories())
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
         }
     }
@@ -494,7 +490,6 @@ export class AddTransaction extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({
                     paymentSearchResult: responseJson.financial_instruments,
                     payments: responseJson.financial_instruments,
@@ -502,8 +497,8 @@ export class AddTransaction extends React.Component {
                 })
             })
             .catch((error) => {
-                console.log(error);
-                ToastAndroid.show('Eso no e así viejooo...', 5);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -515,7 +510,6 @@ export class AddTransaction extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({
                     searchResult: responseJson.transaction_categories,
                     categories: responseJson.transaction_categories
@@ -523,8 +517,8 @@ export class AddTransaction extends React.Component {
                         this.getInstruments())
             })
             .catch((error) => {
-                console.log(error);
-                ToastAndroid.show('Eso no e así viejoo...', 5);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -974,13 +968,13 @@ export class EditTransaction extends React.Component {
             body: JSON.stringify(newTransaction)
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson)
                 this.props.navigation.state.params.onSuccess();
                 this.props.navigation.dispatch(this.backAction);
                 ToastAndroid.show('La transacción se ha actualizado', ToastAndroid.SHORT)
             })
             .catch((error) => {
-                ToastAndroid.show(error.message, ToastAndroid.SHORT);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
 
@@ -990,14 +984,14 @@ export class EditTransaction extends React.Component {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () =>
                         this.getCategories())
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
         }
     }
@@ -1009,7 +1003,6 @@ export class EditTransaction extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({
                     paymentSearchResult: responseJson.financial_instruments,
                     payments: responseJson.financial_instruments,
@@ -1017,8 +1010,8 @@ export class EditTransaction extends React.Component {
                 })
             })
             .catch((error) => {
-                console.log(error);
-                ToastAndroid.show('Eso no e así viejooo...', 5);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -1030,7 +1023,6 @@ export class EditTransaction extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({
                     searchResult: responseJson.transaction_categories,
                     categories: responseJson.transaction_categories
@@ -1038,8 +1030,8 @@ export class EditTransaction extends React.Component {
                         this.getInstruments())
             })
             .catch((error) => {
-                console.log(error);
-                ToastAndroid.show('Eso no e así viejoo...', 5);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -1312,8 +1304,8 @@ export class EditTransaction extends React.Component {
 }
 
 export class TransactionDetail extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             loading: true,
             data: null,
@@ -1337,7 +1329,7 @@ export class TransactionDetail extends React.Component {
         ),
     }
     backAction = NavigationActions.back();
-
+    
     delete() {
         Alert.alert(
             'Eliminar transacción',
@@ -1354,7 +1346,6 @@ export class TransactionDetail extends React.Component {
                             }
                         }).then((response) => response.json())
                             .then((responseJson) => {
-                                console.log(responseJson);
                                 this.props.navigation.state.params.onSuccess();
                                 this.props.navigation.dispatch(this.backAction);
                                 ToastAndroid.show('La transacción se ha eliminado', ToastAndroid.SHORT)
@@ -1362,7 +1353,6 @@ export class TransactionDetail extends React.Component {
                             })
                             .catch((error) => {
                                 ToastAndroid.show('No se pudo eliminar la transacción', 3)
-                                console.log(error)
 
                             });
 
@@ -1408,16 +1398,18 @@ export class TransactionDetail extends React.Component {
                             }
                         }).then((response) => response.json())
                             .then((responseJson) => {
-                                console.log(responseJson);
                                 this.setState({data: responseJson.transaction, loading: false})
                             })
                             .catch((error) => {
-                                ToastAndroid.show('Ve a ver', 3)
-                                console.log(error)
+                                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
                             });
     }
     componentWillMount() {
         this.getTransactionInfo()
+    }
+    componentDidMount() {
+        
     }
     render() {
         const data = this.state.data;

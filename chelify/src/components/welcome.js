@@ -46,7 +46,7 @@ export class Welcome extends React.Component {
                             efectivo siempre es una opción.
                         </Text>
                     </View>
-                    <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, display: 'none' }}>
                         <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
                             <TouchableHighlight onPress={() => this.props.navigation.dispatch(Principal.resetAction)}>
                                 <Text style={styles.textLink}>AGREGAR CUENTA</Text>

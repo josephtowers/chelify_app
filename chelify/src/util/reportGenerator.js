@@ -9,58 +9,44 @@ import {
     VictoryChart,
     VictoryBar,
     VictoryLegend,
+    VictoryPie,
     VictoryTheme,
     VictoryContainer
 } from 'victory-native'
-let data = {
-    title: "Mi reporte",
-    type: "bar",
-    var1: "expenses",
-    var2: "categories",
-    date: "last-six-months"
-}
-let it = 
-[
-    {x: 'Comida', y: 50},
-    {x: 'Romo', y: 250}
-]
-export const generate = (text) => {
-    let dataset = data;
-    let sortBy = []
-    switch(data.var2) {
-        case "categories": {
-            for(let c in transactions) {
-                if(sortBy.indexOf(c.categoryName) == -1) sortBy.push(c.categoryName)
+
+import Settings from '../settings'
+
+
+export const generate = (obj) => {
+    let dataset = []
+    fetch(Settings.baseUrl + "/api/report/build?account_id=" +
+        obj.accountId + "&group_by=" + obj.groupBy + "&start_date=2017-01-01&end_date=2018-01-31", {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
             }
-        }
-        break;
-        case "account": {
-            for(let c in transactions) {
-                if(sortBy.indexOf(c.account) != -1) sortBy.push(c.account)  
-            }
-        }
-        break;
-        case "month": {
-            for(let c in transactions) {
-                let month = c.date.split(/[- :]/)
-                if(sortBy.indexOf(month[1]) != -1) sortBy.push(month[1])  
-            }
-        }
-        break;
-    }
-    return (
-        <VictoryChart
-        theme={VictoryTheme.material}
-  domainPadding={20}
-  containerComponent={<VictoryContainer
-/>}>
-  
-        <VictoryBar 
-        data={it}
-        alignment={'middle'}
-        animate={true}
-        horizontal={true} />
-        </VictoryChart>
-    )
+        }).then((response) => response.json())
+        .then((responseJson) => {
+            dataset = responseJson.result
+            return (
+
+                <VictoryPie
+                    data={dataset}
+                    theme={VictoryTheme.material}
+                    containerComponent={<VictoryContainer
+                    />}
+                    alignment={'middle'}
+                    animate={true}
+                    horizontal={true} />
+            )
+        })
+        .catch((error) => {
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
+
+        });
+
+    
 }
 export default generate;

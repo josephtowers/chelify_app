@@ -4,7 +4,7 @@ import styles from '../../styles/style.js'
 import {
     Text, View, TouchableNativeFeedback, PanResponder, Modal,
     RefreshControl, Image, Dimensions, ScrollView, ToastAndroid, TextInput,
-    TouchableOpacity, Button, Alert, AsyncStorage, ActivityIndicator
+    TouchableOpacity, Button, Alert, AsyncStorage, ActivityIndicator, TouchableHighlight
 } from 'react-native'
 import { StackNavigator, NavigationActions, TabNavigator } from 'react-navigation';
 import ActionButton from 'react-native-action-button'
@@ -70,7 +70,6 @@ export class Groups extends React.Component {
 
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () => {
 
@@ -79,7 +78,8 @@ export class Groups extends React.Component {
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
         }
     }
@@ -92,12 +92,11 @@ export class Groups extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({ groups: responseJson.groups, loading: false, refreshing: false })
             })
             .catch((error) => {
-                ToastAndroid.show('2', 3)
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -134,7 +133,7 @@ export class Groups extends React.Component {
                         <ScrollView refreshControl={<RefreshControl
                             enabled={true}
                             refreshing={this.state.refreshing}
-                            onRefresh={() => (this._onRefresh.bind(this))}
+                            onRefresh={() => (this._onRefresh())}
                         />}>
                             <List>
                                 {
@@ -180,7 +179,7 @@ export class Groups extends React.Component {
                     )
 
             ) : (
-                    <View style={styles.container}>
+                    <View style={styles.whiteContainer}>
                         <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
                     </View>
                 )
@@ -237,8 +236,6 @@ export class GroupDetails extends React.Component {
     cashify(amountIn) {
 
         let amount = parseFloat(amountIn).toFixed(2);
-        // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-        console.log(amount);
         let splitAmount = amount.split(".")[0];
         let i = splitAmount.length - 4;
 
@@ -254,14 +251,14 @@ export class GroupDetails extends React.Component {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () =>
                         this.getCategories())
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
         }
     }
@@ -275,7 +272,6 @@ export class GroupDetails extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 let g = responseJson.group
                 this.setState({
                     data: g,
@@ -289,14 +285,13 @@ export class GroupDetails extends React.Component {
                 
             })
             .catch((error) => {
-                ToastAndroid.show('2', 3)
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
 
     }
     async empty() {
-        console.log('Pay me')
         this.getGroupInfo()
     }
     componentWillMount() {
@@ -315,6 +310,11 @@ export class GroupDetails extends React.Component {
     }
     deletefromGroup() {
         //
+    }
+    backAction = NavigationActions.back();
+    exitGroup() {
+        this.props.navigation.dispatch(this.backAction);
+        this.props.navigation.state.params.onSuccess();
     }
     render() {
         let data = this.state.data;
@@ -393,11 +393,11 @@ export class GroupDetails extends React.Component {
                             </AnimatedCircularProgress>
                         </View>
                     </View>
-                    <GroupTabView key={this.state.groupKey} screenProps={{ data: data, changeMe: this.updateAll.bind(this), balance: this.state.balance, refresh: this.empty.bind(this) }} />
+                    <GroupTabView key={this.state.groupKey} screenProps={{ data: data, changeMe: this.updateAll.bind(this), balance: this.state.balance, refresh: this.empty.bind(this), exit: this.exitGroup.bind(this) }} />
 
                 </View>
             ) : (
-                    <View style={styles.container}>
+                    <View style={styles.whiteContainer}>
                         <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
                     </View>
                 )
@@ -424,14 +424,14 @@ export class GroupTransactions extends React.Component {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user }, () =>
                     this.searchTransactions())
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
         }
     }
@@ -443,8 +443,6 @@ export class GroupTransactions extends React.Component {
     cashify(amountIn) {
 
         let amount = parseFloat(amountIn).toFixed(2);
-        // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-        console.log(amount);
         let splitAmount = amount.split(".")[0];
         let i = splitAmount.length - 4;
 
@@ -484,14 +482,13 @@ export class GroupTransactions extends React.Component {
             })
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.props.screenProps.refresh()
                 this.setModalVisible(false)
                 this.setState({ amount: 0, formattedAmount: '0.00' })
             })
             .catch((error) => {
-                ToastAndroid.show('2', 3)
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
         
@@ -506,7 +503,6 @@ export class GroupTransactions extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({
                     trans: responseJson.contributions,
                     loading: false
@@ -514,8 +510,8 @@ export class GroupTransactions extends React.Component {
                 })
             })
             .catch((error) => {
-                ToastAndroid.show('2', 3)
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -524,7 +520,6 @@ export class GroupTransactions extends React.Component {
     }
     render() {
         let data = this.state.data;
-        console.log(data)
         return (
             !this.state.loading ? (
                 <View style={{ flex: 1 }}>
@@ -594,6 +589,7 @@ export class GroupTransactions extends React.Component {
                         <List>
                             {
                                 this.state.trans.reverse().map((l, i) => (
+                                    l.user.profile_images.length ? (
                                     <ListItem
                                         key={i}
                                         hideChevron={true}
@@ -604,6 +600,18 @@ export class GroupTransactions extends React.Component {
                                         title={l.user.name}
                                         rightTitle={"RD$" + this.cashify(l.amount)}
                                     />
+                                    ) : (
+                                        <ListItem
+                                        key={i}
+                                        hideChevron={true}
+                                        roundAvatar
+                                        rightTitleStyle={{ fontWeight: "100", fontFamily: 'Circular' }}
+                                        fontFamily={"Circular"}
+                                        avatar={require('../../../assets/img/add-picture.jpg')}
+                                        title={l.user.name}
+                                        rightTitle={"RD$" + this.cashify(l.amount)}
+                                    />
+                                    )
                                 ))
                             }
                         </List>
@@ -614,7 +622,7 @@ export class GroupTransactions extends React.Component {
                     />
                 </View>
             ) : (
-                    <View style={styles.container}>
+                    <View style={styles.whiteContainer}>
                         <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
                     </View>
                 )
@@ -643,6 +651,7 @@ export class Members extends React.Component {
         if ((this.state.user.id == data.manager.id) || (this.state.user.id == id)) return true
         return false
     }
+    backAction = NavigationActions.back();
     async getImage(id) {
 
         await fetch(Settings.baseUrl + "/api/image/by-account/" + id, {
@@ -653,13 +662,13 @@ export class Members extends React.Component {
             }
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 if (responseJson.images.length)
                     return { uri: Settings.baseUrl + "/api/image/show/" + responseJson.images[responseJson.images.length - 1].file_name }
                 else return require('../../../assets/img/add-picture.jpg')
             })
             .catch((error) => {
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
                 return null
 
             });
@@ -679,14 +688,14 @@ export class Members extends React.Component {
             })
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.modalVisible(false);
                 ToastAndroid.show('Se ha agregado el miembro', 3);
                 this.props.screenProps.refresh()
                 
             })
             .catch((error) => {
-                console.log(error)
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
 
@@ -694,18 +703,64 @@ export class Members extends React.Component {
     modalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
+    isAdmin(id) {
+        let data = this.props.screenProps.data;
+        if(data.manager.id == id) {
+            return " (Administrador)"
+        }
+        else return ""
+    }
     async getUser() {
         try {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user, loading: false })
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
+
+        }
+    }
+    deleteFromGroup(id) {
+        let data = this.props.screenProps.data;
+        if(data.manager.id == id) {
+            Alert.alert(
+                'Piénsalo dos veces',
+                'Si sales del grupo, todos los usuarios serán eliminados y el grupo desaparecerá. ¿Estás seguro?',
+                [
+                    { text: 'Cancelar', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                    {
+                        text: 'Eliminar', onPress: () => {
+                            fetch(Settings.baseUrl + "/api/group/" + data.id, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                }
+                            }).then((response) => response.json())
+                                .then((responseJson) => {
+                                    this.props.screenProps.exit();
+                                    ToastAndroid.show('Se ha eliminado el grupo', ToastAndroid.SHORT)
+    
+                                })
+                                .catch((error) => {
+                                    ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
+    
+                                });
+    
+                        }
+                    },
+                ],
+                { cancelable: false }
+            )
+        } else if(this.state.user.id == id) {
+
+        } else {
 
         }
     }
@@ -725,10 +780,10 @@ export class Members extends React.Component {
                         onRequestClose={() => this.modalVisible(false)}
                     ><View style={{ paddingHorizontal: 28, flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(44, 47, 51, 0.9)', justifyContent: 'center' }}>
                             <View style={{ flex: 1, paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'white' }}>
-                                <Text style={{ fontFamily: 'Circular', color: 'black', fontSize: 18, textAlign: 'center' }}>Crear código de acceso</Text>
+                                <Text style={{ fontFamily: 'Circular', color: 'black', fontSize: 18, textAlign: 'center' }}>Agregar miembro al grupo</Text>
                                 <View style={{ marginTop: 5 }}>
                                     <Text style={{ fontSize: 16, fontFamily: 'Circular' }}>
-                                        Introduzca el correo electrónico del usuario que quiere agregar
+                                        Introduzca el correo electrónico del usuario que quieres agregar
                     </Text>
                                 </View>
                                 <TextInput
@@ -750,69 +805,66 @@ export class Members extends React.Component {
                             </View>
                         </View>
                     </Modal>
-                        <Text style={{ fontFamily: 'Circular', marginTop: 10, textAlign: 'center' }}>ADMINISTRADOR</Text>
-                        <List>
-                            {
-                                this.state.user.id == data.manager.id ? (
-                                    <ListItem
-                                        title={data.manager.name}
-                                        subtitle={data.manager.email}
-                                        avatarStyle={{ backgroundColor: 'white' }}
-                                        roundAvatar
-                                        avatar={require('../../../assets/img/add-picture.jpg')}
-                                        fontFamily={"Circular"}
-                                        subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
-                                        rightIcon={<Image
-                                            style={{ width: 10, height: 10, marginRight: 6, alignSelf: 'center' }}
-                                            source={require('../../../assets/img/icons/delete.png')}
-                                        />}
-                                    />
-                                ) : (
-                                        <ListItem
-                                            title={data.manager.name}
-                                            subtitle={data.manager.email}
-                                            avatarStyle={{ backgroundColor: 'white' }}
-                                            roundAvatar
-                                            hideChevron={true}
-                                            avatar={require('../../../assets/img/add-picture.jpg')}
-                                            fontFamily={"Circular"}
-                                            subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
-                                        />
-                                    )
-                            }
-
-                        </List>
-                        <Text style={{ fontFamily: 'Circular', marginTop: 10, textAlign: 'center' }}>MIEMBROS</Text>
                         <List>
                             {
                                 data.users.map((l, i) => (
                                     this.canDelete(l.id) ? (
+                                        l.profile_images.length ? (
                                         <ListItem
                                             key={i}
-                                            title={l.name}
+                                            title={l.name + this.isAdmin(l.id)}
+                                            subtitle={l.email}
+                                            avatarStyle={{ backgroundColor: 'white' }}
+                                            roundAvatar
+                                            avatar={{uri: "https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/show/" + l.profile_images[0].file_name}}
+                                            fontFamily={"Circular"}
+                                            subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
+                                            rightIcon={<TouchableOpacity style={{alignSelf: 'center'}} onPress={() => this.deleteFromGroup(l.id)}><Image
+                                                style={{ width: 10, height: 10, marginRight: 6, alignSelf: 'center' }}
+                                                source={require('../../../assets/img/icons/delete.png')}
+                                            /></TouchableOpacity>}
+                                            
+                                        /> ) : (
+                                            <ListItem
+                                            key={i}
+                                            title={l.name + this.isAdmin(l.id)}
                                             subtitle={l.email}
                                             avatarStyle={{ backgroundColor: 'white' }}
                                             roundAvatar
                                             avatar={require('../../../assets/img/add-picture.jpg')}
                                             fontFamily={"Circular"}
                                             subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
-                                            rightIcon={<Image
+                                            rightIcon={<TouchableOpacity style={{alignSelf: 'center'}} onPress={() => this.deleteFromGroup(l.id)}><Image
                                                 style={{ width: 10, height: 10, marginRight: 6, alignSelf: 'center' }}
                                                 source={require('../../../assets/img/icons/delete.png')}
-                                            />}
+                                            /></TouchableOpacity>}
+                                            
                                         />
+                                        )
                                     ) : (
+                                        l.profile_images.length ? (
                                             <ListItem
                                                 key={i}
-                                                title={l.name}
+                                                title={l.name + this.isAdmin(l.id)}
                                                 subtitle={l.email}
                                                 avatarStyle={{ backgroundColor: 'white' }}
                                                 roundAvatar
                                                 hideChevron={true}
-                                                avatar={require('../../../assets/img/add-picture.jpg')}
+                                                avatar={{uri: "https://chelify-nicoavn.c9users.io/chelify_server/public/api/image/show/" + l.profile_images[0].file_name}}
                                                 fontFamily={"Circular"}
                                                 subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
                                             />
+                                        ) : (<ListItem
+                                            key={i}
+                                            title={l.name + this.isAdmin(l.id)}
+                                            subtitle={l.email}
+                                            avatarStyle={{ backgroundColor: 'white' }}
+                                            roundAvatar
+                                            hideChevron={true}
+                                            avatar={require('../../../assets/img/add-picture.jpg')}
+                                            fontFamily={"Circular"}
+                                            subtitleStyle={{ fontFamily: 'Circular', fontWeight: '100' }}
+                                        />)
                                         )
                                 ))
                             }
@@ -824,7 +876,7 @@ export class Members extends React.Component {
                     />
                 </View>
             ) : (
-                    <View style={styles.container}>
+                    <View style={styles.whiteContainer}>
                         <ActivityIndicator size="large" color="#24E189" animating={this.state.loading} />
                     </View>
                 )
@@ -869,8 +921,6 @@ export class AddGroup extends React.Component {
     cashify(amountIn) {
 
         let amount = parseFloat(amountIn).toFixed(2);
-        // let amount = parseFloat(this.truncator(amountIn, 2)).toString();
-        console.log(amount);
         let splitAmount = amount.split(".")[0];
         let i = splitAmount.length - 4;
 
@@ -926,13 +976,13 @@ export class AddGroup extends React.Component {
             body: JSON.stringify(newGroup)
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson)
                 this.props.navigation.state.params.onSuccess();
                 this.props.navigation.dispatch(this.backAction);
                 ToastAndroid.show('Se ha creado el grupo', ToastAndroid.SHORT)
             })
             .catch((error) => {
-                ToastAndroid.show(error.message, ToastAndroid.SHORT);
+                ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
             });
     }
@@ -942,13 +992,13 @@ export class AddGroup extends React.Component {
             if (this.state.user == null) {
                 let user = await AsyncStorage.getItem('currentUser');
                 let value = JSON.parse(user);
-                console.log(value);
                 if (value !== null) {
                     this.setState({ user: value.user, loading: false })
                 }
             }
         } catch (error) {
-            console.log('2value');
+            ToastAndroid.show('Hubo un problema con su solicitud. Intente de nuevo más tarde', ToastAndroid.SHORT)
+
 
         }
     }
@@ -1020,6 +1070,7 @@ export class AddGroup extends React.Component {
                         placeholderTextColor="#787878"
                         underlineColorAndroid="#787878"
                         value={this.state.name}
+                        fontFamily={'Circular'}
                         onChangeText={(text) => this.setState({ name: text })}
                     />
                     <View style={{ flexDirection: 'row' }}>
@@ -1029,6 +1080,7 @@ export class AddGroup extends React.Component {
                                 placeholderTextColor="#787878"
                                 underlineColorAndroid="#787878"
                                 value={this.state.incomingUser}
+                                fontFamily={'Circular'}
                                 keyboardType="email-address"
                                 onChangeText={(text) => this.setState({ incomingUser: text })}
                                 autoCapitalize="none"

@@ -16,6 +16,13 @@ export const styles = StyleSheet.create({
             backgroundColor: '#2C2F33',
             width: Dimensions.get('window').width
         },
+        whiteContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white',
+            width: Dimensions.get('window').width
+        },
         points: {
             backgroundColor: 'transparent',
             position: 'absolute',
@@ -159,6 +166,11 @@ export const styles = StyleSheet.create({
             width: Dimensions.get('window').width - 30,
             height: 200,
             marginBottom: 20
+        },
+        reportChart: {
+            width: Dimensions.get('window').width - 30,
+            height: 300,
+            marginVertical: 20
         },
         chartContainer: {
             flex: 1,

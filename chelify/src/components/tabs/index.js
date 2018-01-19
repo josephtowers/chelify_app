@@ -8,7 +8,7 @@ import { ToastAndroid } from 'react-native'
 
 export const TabView = TabNavigator({
     Overview: {
-        screen: OverviewStack,
+        screen: OverviewStack
     },
     Transactions: {
         screen: TransactionsStack

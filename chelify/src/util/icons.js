@@ -134,6 +134,22 @@ export let categoryIcons = [
 	{
 		name: 'others',
 		source: require('../../assets/img/icons/others.png')
+	},
+	{
+		name: 'recurrent',
+		source: require('../../assets/img/icons/recurrent.png')
+	},
+	{
+		name: 'VISA',
+		source: require('../../assets/img/icons/visa.png')
+	},
+	{
+		name: 'MC',
+		source: require('../../assets/img/icons/mastercard.png')
+	},
+	{
+		name: 'AMEX',
+		source: require('../../assets/img/icons/amex.png')
 	}
 ]
 
